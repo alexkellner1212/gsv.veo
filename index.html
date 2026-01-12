@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSV Eintracht Baunatal - E-Jugend Wintercup 2026</title>
+    <title>GSV Eintracht Baunatal - Wintercup 2026</title>
     <style>
         :root {
             --gsv-blue: #00458b;
@@ -51,9 +51,34 @@
         .header-right h1 { margin: 0; font-size: 1.8rem; text-transform: uppercase; font-weight: 900; }
         .header-right p { margin: 0; font-size: 0.95rem; color: var(--accent-silver); }
 
+        /* --- TABS / REITER --- */
+        .tab-bar {
+            display: flex;
+            background: #f0f0f0;
+            border-bottom: 2px solid var(--accent-silver);
+        }
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #555;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        .tab-button.active {
+            background: var(--gsv-blue);
+            color: white;
+        }
+
         /* --- MAIN --- */
         main { flex-grow: 1; position: relative; background: #f4f4f4; }
-        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .tab-content { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .tab-content.active { display: block; }
+        iframe { width: 100%; height: 100%; border: none; }
 
         /* --- FOOTER --- */
         footer {
@@ -84,35 +109,20 @@
         .sponsor-container img { height: 65px; max-width: 200px; object-fit: contain; }
         .divider { width: 1px; height: 50px; background: #ddd; }
 
-        /* --- OPTIMIERUNG FÜR HANDY / TABLET --- */
+        /* --- MOBILE OPTIMIERUNG --- */
         @media (max-width: 900px) {
-            header { 
-                height: 75px; 
-                padding: 5px 15px;
-            }
-            .header-left { flex: 0; }
-            .gsv-logo { height: 50px; } 
-            .qr-section, .claim-img, .header-right p { display: none; } 
-            
-            .header-center { flex: 2; }
-            #clock { font-size: 1.6rem; } 
+            header { height: 75px; padding: 5px 15px; }
+            .gsv-logo { height: 50px; }
+            .qr-section, .claim-img, .header-right p { display: none; }
+            #clock { font-size: 1.6rem; }
             #date { font-size: 0.7rem; }
+            .header-right h1 { font-size: 0.9rem; }
             
-            .header-right { flex: 1; }
-            .header-right h1 { font-size: 0.9rem; white-space: nowrap; }
+            .tab-button { padding: 10px; font-size: 0.85rem; }
 
-            /* Vergrößerte Sponsoren-Ansicht mobil */
-            footer { 
-                padding: 12px 5px; 
-                min-height: 85px; 
-                border-top-width: 4px;
-            }
-            .label-box { font-size: 0.6rem; padding: 2px 12px; top: -12px; }
+            footer { padding: 12px 5px; min-height: 85px; }
             .sponsor-container { gap: 25px; }
-            .sponsor-container img { 
-                height: 45px; /* Erheblich vergrößert von 25px */
-                max-width: 130px; 
-            }
+            .sponsor-container img { height: 45px; max-width: 130px; } /* Große Logos mobil */
             .divider { height: 35px; }
         }
     </style>
@@ -136,12 +146,23 @@
 
     <div class="header-right">
         <h1>Wintercup 2026</h1>
-        <p>E-Jugend (Jg. 2016)</p>
+        <p>GSV Eintracht Baunatal</p>
     </div>
 </header>
 
+<nav class="tab-bar">
+    <button class="tab-button active" onclick="openTab('u10')">E-Jugend (2016)</button>
+    <button class="tab-button" onclick="openTab('u11')">E-Jugend (2015)</button>
+</nav>
+
 <main>
-    <iframe src="https://mytman.io/turnierplan-vollbild/?turnier_id=6379&turniermodus=7&showheader=0&showinfo=0&showsponsors=0&refresh=1&showlogos=1"></iframe>
+    <div id="u10" class="tab-content active">
+        <iframe src="https://mytman.io/turnierplan-vollbild/?turnier_id=6379&turniermodus=7&showheader=0&showinfo=0&showsponsors=0&refresh=1&showlogos=1"></iframe>
+    </div>
+
+    <div id="u11" class="tab-content">
+        <iframe src="https://mytman.io/turnierplan-vollbild/?turnier_id=6384&turniermodus=3&showheader=0&showinfo=0&showsponsors=0&refresh=1&showlogos=1"></iframe>
+    </div>
 </main>
 
 <footer>
@@ -154,6 +175,19 @@
 </footer>
 
 <script>
+    // Tab-Funktion
+    function openTab(tabId) {
+        const contents = document.querySelectorAll('.tab-content');
+        const buttons = document.querySelectorAll('.tab-button');
+
+        contents.forEach(content => content.classList.remove('active'));
+        buttons.forEach(button => button.classList.remove('active'));
+
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Uhrzeit-Funktion
     function updateClock() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -165,8 +199,8 @@
     }
     setInterval(updateClock, 1000);
     updateClock();
-    
-    // Seite alle 15 Minuten neu laden
+
+    // Automatischer Reload alle 15 Minuten
     setTimeout(() => location.reload(), 900000);
 </script>
 

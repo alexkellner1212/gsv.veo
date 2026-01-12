@@ -3,154 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veo Cam Verleih - Buche dein Spiel</title>
+    <title>GSV Eintracht Baunatal - E-Jugend Wintercup 2026</title>
     <style>
         :root {
-            --primary-color: #23d160;
-            --paypal-color: #0070ba;
-            --dark-bg: #1a1a1a;
-            --light-text: #f5f5f5;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-            color: #333;
-            background-color: #fcfcfc;
+            --gsv-blue: #00458b;
+            --gsv-white: #ffffff;
+            --accent-silver: #e5e5e5;
         }
 
-        header {
-            background-color: var(--dark-bg);
-            color: var(--light-text);
-            padding: 40px 20px;
-            text-align: center;
-        }
+        * { box-sizing: border-box; }
 
-        h1 { margin: 0; font-size: 2.5rem; }
-        h2 { font-weight: 300; color: #ccc; margin-top: 10px; font-size: 1.2rem; }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .booking-container {
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--gsv-white);
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 20px;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .box {
-            flex: 1;
-            min-width: 300px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .btn-paypal {
-            background-color: var(--paypal-color);
+        /* --- HEADER --- */
+        header {
+            background-color: var(--gsv-blue);
             color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            display: block;
-            margin-top: 20px;
+            padding: 10px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 5px solid var(--accent-silver);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 10;
+            height: 110px;
         }
-        
-        .btn-paypal:hover { background-color: #005a96; }
 
-        /* Calendly Inline Style Overrides */
-        .calendly-inline-widget {
-            min-width: 320px;
-            height: 630px;
-        }
-        
+        .header-left { flex: 1; display: flex; align-items: center; gap: 15px; }
+        .gsv-logo { height: 75px; background: white; padding: 5px; border-radius: 8px; }
+        .claim-img { height: 45px; filter: brightness(0) invert(1); }
+        .qr-section { background: white; padding: 5px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; }
+        .qr-code { width: 60px; height: 60px; }
+        .qr-text { color: var(--gsv-blue); font-size: 0.6rem; font-weight: 900; margin-top: 2px; text-transform: uppercase; }
+
+        .header-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        #clock { font-size: 2.8rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+        #date { font-size: 1.1rem; color: var(--accent-silver); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+        .header-right { flex: 1; text-align: right; }
+        .header-right h1 { margin: 0; font-size: 1.8rem; text-transform: uppercase; font-weight: 900; }
+        .header-right p { margin: 0; font-size: 0.95rem; color: var(--accent-silver); }
+
+        /* --- MAIN --- */
+        main { flex-grow: 1; position: relative; background: #f4f4f4; }
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        /* --- FOOTER (Optimiert für Desktop) --- */
         footer {
-            background-color: var(--dark-bg);
-            color: #777;
-            text-align: center;
-            padding: 20px;
-            margin-top: 40px;
+            background: var(--gsv-white);
+            border-top: 6px solid var(--gsv-blue);
+            padding: 15px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100px;
+        }
+
+        .label-box {
+            position: absolute;
+            top: -18px;
+            background: var(--gsv-blue);
+            color: white;
+            padding: 4px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            border: 2px solid var(--accent-silver);
+        }
+
+        .sponsor-container { display: flex; align-items: center; gap: 50px; }
+        .sponsor-container img { height: 60px; max-width: 180px; object-fit: contain; }
+        .divider { width: 1px; height: 50px; background: #ddd; }
+
+        /* --- MOBILE OPTIMIERUNG (Handy-spezifisch) --- */
+        @media (max-width: 900px) {
+            header { height: auto; flex-direction: column; padding: 10px; gap: 8px; }
+            .header-left, .header-right { flex: none; width: 100%; justify-content: center; text-align: center; }
+            .qr-section, .claim-img { display: none; } /* Spart massiv Platz auf dem Handy */
+            #clock { font-size: 2.2rem; }
+            #date { font-size: 0.9rem; }
+            .header-right h1 { font-size: 1.4rem; }
+
+            /* Footer-Optimierung für Mobilgeräte */
+            footer { 
+                padding: 10px; 
+                min-height: 60px; /* Deutlich flacher */
+                border-top-width: 4px;
+            }
+            .label-box { 
+                font-size: 0.65rem; 
+                padding: 2px 15px; 
+                top: -12px; 
+            }
+            .sponsor-container { gap: 20px; }
+            .sponsor-container img { 
+                height: 30px; /* Logos stark verkleinert */
+                max-width: 100px; 
+            }
+            .divider { height: 25px; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Veo Cam Verleih</h1>
-        <h2>Professionelle Spielanalyse für 20€ pro Spiel</h2>
-    </header>
-
-    <div class="container">
-        
-        <div class="booking-container">
-            
-            <div class="box">
-                <h3>1. Termin Buchen</h3>
-                <p>Wähle dein Spiel-Datum aus.</p>
-                <div class="calendly-inline-widget" data-url="https://calendly.com/alex-kellner1212/veo_cam?hide_landing_page_details=1&hide_gdpr_banner=1" style="min-width:320px;height:630px;"></div>
-                <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-            </div>
-
-            <div class="box" id="payment-section">
-                <h3>2. Bezahlung</h3>
-                <p>Miete für 1 Spiel</p>
-                <h2 style="color: var(--primary-color);">20,00 €</h2>
-                <p><small>Zahlung sicher per PayPal an Alex Kellner</small></p>
-
-                <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-                    <input type="hidden" name="cmd" value="_xclick">
-                    <input type="hidden" name="business" value="alex_kellner@me.com">
-                    <input type="hidden" name="item_name" value="Veo Cam Miete (1 Spiel)">
-                    <input type="hidden" name="currency_code" value="EUR">
-                    <input type="hidden" name="amount" value="20.00"> <button type="submit" class="btn-paypal">Jetzt 20€ Bezahlen</button>
-                </form>
-            </div>
-
+<header>
+    <div class="header-left">
+        <img src="https://www.eintracht-baunatal.de/assets/images/5/GSV-Logo-c806e7ce.svg" alt="GSV Logo" class="gsv-logo">
+        <img src="https://www.eintracht-baunatal.de/assets/images/5/gsv-claim-52d4940a.svg" alt="E-Jugend" class="claim-img">
+        <div class="qr-section">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://mytman.io/turnierplan-vollbild/?turnier_id=6379" alt="QR Plan" class="qr-code">
+            <div class="qr-text">Mobil-Plan</div>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2024 Veo Cam Verleih</p>
-    </footer>
+    <div class="header-center">
+        <div id="clock">00:00:00</div>
+        <div id="date">WIRD GELADEN...</div>
+    </div>
 
-    <script>
-        function isCalendlyEvent(e) {
-            return e.data.event && e.data.event.indexOf('calendly') === 0;
-        }
+    <div class="header-right">
+        <h1>Wintercup 2026</h1>
+        <p>E-Jugend (Jg. 2016)</p>
+    </div>
+</header>
 
-        window.addEventListener('message', function(e) {
-            if (isCalendlyEvent(e)) {
-                // Prüfen, ob das Event "Ternim gebucht" ist
-                if (e.data.event === 'calendly.event_scheduled') {
-                    
-                    // HIER PASSIERT DIE WEITERLEITUNG
-                    // Aktuell: Scrollt sanft zum Bezahl-Bereich
-                    document.getElementById('payment-section').scrollIntoView({ 
-                        behavior: 'smooth' 
-                    });
-                    
-                    alert("Termin erfolgreich gebucht! Bitte schließe nun die Zahlung ab.");
+<main>
+    <iframe src="https://mytman.io/turnierplan-vollbild/?turnier_id=6379&turniermodus=7&showheader=0&showinfo=0&showsponsors=0&refresh=1&showlogos=1"></iframe>
+</main>
 
-                    // ALTERNATIV: Echte Weiterleitung zu einer anderen Seite (Kommentar entfernen):
-                    // window.location.href = 'https://www.paypal.com/...'; 
-                }
-            }
-        });
-    </script>
+<footer>
+    <div class="label-box">Partner</div>
+    <div class="sponsor-container">
+        <img src="https://www.neofit-studio.de/wp-content/uploads/2025/03/neofit-logo.png" alt="Neofit">
+        <div class="divider"></div>
+        <img src="https://deltatrans.de/wp-content/uploads/2023/04/deltatrans_logo_90.png" alt="Deltatrans">
+    </div>
+</footer>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+        const options = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+        document.getElementById('date').textContent = now.toLocaleDateString('de-DE', options);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+    setTimeout(() => location.reload(), 900000);
+</script>
 
 </body>
 </html>

@@ -9,16 +9,19 @@
             --gsv-blue: #00458b;
             --gsv-white: #ffffff;
             --accent-silver: #e5e5e5;
+            --gsv-gold: #ffcc00;
+            --tab-height: 55px;
+            --header-height: 110px;
+            --footer-height: 120px;
         }
 
         * { box-sizing: border-box; }
 
         body, html {
-            margin: 0; padding: 0; height: 100%;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: var(--gsv-white);
-            display: flex;
-            flex-direction: column;
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f8f9fa;
+            height: 100vh;
             overflow: hidden;
         }
 
@@ -31,67 +34,70 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 5px solid var(--accent-silver);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            height: var(--header-height);
+            position: relative;
             z-index: 10;
-            height: 110px;
         }
 
         .header-left { flex: 1; display: flex; align-items: center; gap: 15px; }
         .gsv-logo { height: 75px; background: white; padding: 5px; border-radius: 8px; }
         .claim-img { height: 45px; filter: brightness(0) invert(1); }
         
-        .qr-section { background: white; padding: 3px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; }
-        .qr-image { height: 75px; width: auto; border-radius: 4px; }
-        .qr-text { color: var(--gsv-blue); font-size: 0.6rem; font-weight: 900; margin-top: 2px; text-transform: uppercase; }
+        .qr-section { background: white; padding: 4px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; min-width: 75px; }
+        .qr-image { height: 60px; width: auto; border-radius: 4px; }
+        .qr-text { color: var(--gsv-blue); font-size: 0.55rem; font-weight: 800; margin-top: 2px; text-transform: uppercase; }
 
-        .header-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .header-center { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
         #clock { font-size: 2.8rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
-        #live-date { font-size: 1.1rem; color: var(--accent-silver); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        #live-date { font-size: 1rem; color: var(--accent-silver); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
 
         .header-right { flex: 1; text-align: right; }
-        .header-right h1 { margin: 0; font-size: 1.6rem; text-transform: uppercase; font-weight: 900; }
-        .header-right .tournament-info { margin: 0; font-size: 1.1rem; color: #ffcc00; font-weight: bold; }
-        .header-right p { margin: 0; font-size: 0.85rem; color: var(--accent-silver); }
+        .header-right h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; font-weight: 900; }
+        .tournament-info { color: var(--gsv-gold); font-weight: bold; font-size: 1.1rem; }
 
         /* --- TABS --- */
         .tab-bar {
             display: flex;
-            background: #f0f0f0;
+            background: #eee;
             border-bottom: 2px solid var(--accent-silver);
+            height: var(--tab-height);
         }
         .tab-button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #555;
-            transition: all 0.2s;
-            text-transform: uppercase;
+            flex: 1; border: none; background: none;
+            cursor: pointer; font-weight: 800; font-size: 1.05rem; color: #666;
+            text-transform: uppercase; transition: 0.3s;
         }
-        .tab-button.active {
-            background: var(--gsv-blue);
-            color: white;
-        }
+        .tab-button.active { background: var(--gsv-blue); color: white; }
 
-        /* --- MAIN --- */
-        main { flex-grow: 1; position: relative; background: #f4f4f4; }
-        .tab-content { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        /* --- MAIN AREA --- */
+        main { 
+            height: calc(100vh - var(--header-height) - var(--tab-height) - var(--footer-height));
+            overflow-y: auto; 
+            background: #f4f4f4;
+            position: relative;
+        }
+        
+        .tab-content { display: none; width: 100%; height: 100%; }
         .tab-content.active { display: block; }
-        iframe { width: 100%; height: 100%; border: none; }
+        
+        iframe { width: 100%; height: 100%; border: none; display: block; }
 
         /* --- FOOTER --- */
         footer {
-            background: var(--gsv-white);
+            background: white;
             border-top: 6px solid var(--gsv-blue);
-            padding: 10px 15px 5px 15px;
-            position: relative;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--footer-height);
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 120px;
+            justify-content: center;
+            z-index: 1000;
         }
 
         .label-box {
@@ -99,44 +105,30 @@
             top: -18px;
             background: var(--gsv-blue);
             color: white;
-            padding: 4px 25px;
+            padding: 5px 30px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            border: 2px solid var(--accent-silver);
         }
 
-        .sponsor-container { display: flex; align-items: center; gap: 60px; margin-bottom: 10px; }
-        .sponsor-container img { height: 75px; max-width: 250px; object-fit: contain; }
-        .divider { width: 1px; height: 50px; background: #ddd; }
+        .sponsor-container { display: flex; align-items: center; justify-content: center; gap: 40px; width: 100%; }
+        .sponsor-container img { height: 50px; max-width: 180px; object-fit: contain; }
+        .divider { width: 1px; height: 35px; background: #ddd; }
 
         .copyright-bar {
-            font-size: 0.75rem;
-            color: #777;
-            border-top: 1px solid #eee;
-            width: 100%;
-            text-align: center;
-            padding-top: 5px;
+            font-size: 0.65rem;
+            color: #999;
+            margin-top: 10px;
         }
 
-        /* --- MOBILE OPTIMIERUNG --- */
+        /* --- MOBILE --- */
         @media (max-width: 900px) {
-            header { height: 75px; padding: 5px 15px; }
-            .gsv-logo { height: 45px; }
-            .qr-section, .claim-img, .header-right p { display: none; }
-            #clock { font-size: 1.6rem; }
-            #live-date { font-size: 0.7rem; }
-            
-            .header-right h1 { font-size: 0.85rem; }
-            .header-right .tournament-info { font-size: 0.75rem; }
-
-            .tab-button { padding: 12px; font-size: 0.8rem; }
-
-            footer { min-height: 100px; }
-            .sponsor-container { gap: 30px; margin-bottom: 5px; }
-            .sponsor-container img { height: 50px; max-width: 140px; }
-            .copyright-bar { font-size: 0.6rem; }
+            :root { --header-height: auto; --footer-height: 100px; }
+            .qr-section, .claim-img { display: none; }
+            #clock { font-size: 1.8rem; }
+            .sponsor-container img { height: 30px; }
+            .sponsor-container { gap: 15px; }
         }
     </style>
 </head>
@@ -148,34 +140,33 @@
         <img src="https://www.eintracht-baunatal.de/assets/images/5/gsv-claim-52d4940a.svg" alt="E-Jugend" class="claim-img">
         <div class="qr-section">
             <img src="https://i.ibb.co/mYCfctx/Screenshot-2026-01-12-095357.png" alt="Spielplan QR" class="qr-image">
-            <div class="qr-text">Spielplan</div>
+            <div class="qr-text">Live-Plan</div>
         </div>
     </div>
 
     <div class="header-center">
         <div id="clock">00:00:00</div>
-        <div id="live-date">WIRD GELADEN...</div>
+        <div id="live-date">LÄDT...</div>
     </div>
 
     <div class="header-right">
         <h1>Wintercup 2026</h1>
         <div class="tournament-info">01.02.2026</div>
-        <p>E-Jugend Hallenturnier</p>
     </div>
 </header>
 
 <nav class="tab-bar">
-    <button class="tab-button active" onclick="openTab(event, 'u10')">E4 2016</button>
-    <button class="tab-button" onclick="openTab(event, 'u11')">E3 2015/2016</button>
+    <button class="tab-button active" onclick="openTab(event, 'u10')">E4 (2016er)</button>
+    <button class="tab-button" onclick="openTab(event, 'u11')">E3 (2015/16)</button>
 </nav>
 
-<main>
+<main id="scroll-area">
     <div id="u10" class="tab-content active">
-        <iframe src="https://mytman.io/turnierplan-vollbild/?turnier_id=6379&turniermodus=7&showheader=0&showinfo=0&showsponsors=0&refresh=1&showlogos=1" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+        <iframe src="https://mytman.io/turnierplan-vollbild/?turnier_id=6379&turniermodus=7&showheader=0&showinfo=0&showsponsors=0&refresh=1&showlogos=1"></iframe>
     </div>
 
     <div id="u11" class="tab-content">
-        <iframe src="https://mytman.io/turnierplan-vollbild/?turnier_id=6384&turniermodus=3&showheader=0&showinfo=0&showsponsors=0&refresh=1&showlogos=1" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+        <iframe src="https://mytman.io/turnierplan-vollbild/?turnier_id=6384&turniermodus=3&showheader=0&showinfo=0&showsponsors=0&refresh=1&showlogos=1"></iframe>
     </div>
 </main>
 
@@ -185,42 +176,42 @@
         <img src="https://www.neofit-studio.de/wp-content/uploads/2025/03/neofit-logo.png" alt="Neofit">
         <div class="divider"></div>
         <img src="https://i.ibb.co/m5QzmDZV/Screenshot-2026-01-12-120707.jpg" alt="DeltaTrans">
+        <div class="divider"></div>
+        <img src="https://www.sibo-beton.de/img/logo-sibobeton.webp" alt="Sibo Beton">
     </div>
     <div class="copyright-bar">
-        © 2026 Eintracht Baunatal | Alexander Kellner
+        &copy; 2026 GSV Eintracht Baunatal | Alexander Kellner
     </div>
 </footer>
 
 <script>
     function openTab(evt, tabId) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tab-content");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        tablinks = document.getElementsByClassName("tab-button");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-        document.getElementById(tabId).style.display = "block";
-        evt.currentTarget.className += " active";
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach(content => content.classList.remove("active"));
+        const buttons = document.querySelectorAll(".tab-button");
+        buttons.forEach(btn => btn.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+        document.getElementById('scroll-area').scrollTop = 0;
     }
 
     function updateClock() {
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
-        const options = { weekday: 'short', day: '2-digit', month: 'short' };
-        document.getElementById('live-date').textContent = now.toLocaleDateString('de-DE', options);
+        document.getElementById('clock').textContent = now.toLocaleTimeString('de-DE');
+        document.getElementById('live-date').textContent = now.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'short' });
     }
     
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Automatischer Refresh alle 2 Minuten
-    setTimeout(() => location.reload(), 120000);
+    // Alle 60 Sekunden die Turnierpläne im Hintergrund aktualisieren
+    setInterval(() => {
+        document.querySelectorAll('iframe').forEach(frame => {
+            if(frame.contentWindow) {
+                frame.contentWindow.location.reload();
+            }
+        });
+    }, 60000);
 </script>
 
 </body>

@@ -55,7 +55,7 @@
         main { flex-grow: 1; position: relative; background: #f4f4f4; }
         iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        /* --- FOOTER (Optimiert für Desktop) --- */
+        /* --- FOOTER --- */
         footer {
             background: var(--gsv-white);
             border-top: 6px solid var(--gsv-blue);
@@ -84,32 +84,35 @@
         .sponsor-container img { height: 60px; max-width: 180px; object-fit: contain; }
         .divider { width: 1px; height: 50px; background: #ddd; }
 
-        /* --- MOBILE OPTIMIERUNG (Handy-spezifisch) --- */
+        /* --- EXTREME MOBILE OPTIMIERUNG --- */
         @media (max-width: 900px) {
-            header { height: auto; flex-direction: column; padding: 10px; gap: 8px; }
-            .header-left, .header-right { flex: none; width: 100%; justify-content: center; text-align: center; }
-            .qr-section, .claim-img { display: none; } /* Spart massiv Platz auf dem Handy */
-            #clock { font-size: 2.2rem; }
-            #date { font-size: 0.9rem; }
-            .header-right h1 { font-size: 1.4rem; }
+            header { 
+                height: 70px; /* Header-Höhe fast halbiert */
+                flex-direction: row; 
+                padding: 5px 15px;
+                gap: 5px;
+            }
+            .header-left { flex: 0; }
+            .gsv-logo { height: 45px; } /* Kleineres Logo */
+            .qr-section, .claim-img, .header-right p { display: none; } /* Unnötiges weg */
+            
+            .header-center { flex: 2; }
+            #clock { font-size: 1.5rem; } /* Uhr schmaler */
+            #date { font-size: 0.65rem; margin-top: 0; }
+            
+            .header-right { flex: 1; }
+            .header-right h1 { font-size: 0.9rem; white-space: nowrap; }
 
-            /* Footer-Optimierung für Mobilgeräte */
+            /* Footer-Optimierung */
             footer { 
-                padding: 10px; 
-                min-height: 60px; /* Deutlich flacher */
-                border-top-width: 4px;
+                padding: 5px; 
+                min-height: 50px; 
+                border-top-width: 3px;
             }
-            .label-box { 
-                font-size: 0.65rem; 
-                padding: 2px 15px; 
-                top: -12px; 
-            }
-            .sponsor-container { gap: 20px; }
-            .sponsor-container img { 
-                height: 30px; /* Logos stark verkleinert */
-                max-width: 100px; 
-            }
-            .divider { height: 25px; }
+            .label-box { font-size: 0.55rem; padding: 1px 10px; top: -10px; }
+            .sponsor-container { gap: 15px; }
+            .sponsor-container img { height: 25px; max-width: 80px; }
+            .divider { height: 20px; }
         }
     </style>
 </head>
@@ -156,7 +159,7 @@
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
         document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
-        const options = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+        const options = { weekday: 'short', day: '2-digit', month: 'short' };
         document.getElementById('date').textContent = now.toLocaleDateString('de-DE', options);
     }
     setInterval(updateClock, 1000);

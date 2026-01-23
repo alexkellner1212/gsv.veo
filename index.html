@@ -193,8 +193,8 @@
 </header>
 
 <nav class="tab-bar">
-    <button class="tab-button active" onclick="openTab('u10')">E4 (2016) | 09:00 - 14:00</button>
-    <button class="tab-button" onclick="openTab('u11')">E3 (15/16) | 14:00 - 19:00</button>
+    <button id="btn-u10" class="tab-button active" onclick="openTab('u10')">E4 (2016) | 09:00 - 14:00</button>
+    <button id="btn-u11" class="tab-button" onclick="openTab('u11')">E3 (15/16) | 14:00 - 19:00</button>
 </nav>
 
 <main>
@@ -238,14 +238,28 @@
         document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
         
         // Gewählten Tab anzeigen
-        document.getElementById(tabId).classList.add("active");
+        const selectedTab = document.getElementById(tabId);
+        if (selectedTab) {
+            selectedTab.classList.add("active");
+        }
         
         // Button als aktiv markieren
-        event.currentTarget.classList.add("active");
+        const activeBtn = document.getElementById('btn-' + tabId);
+        if (activeBtn) {
+            activeBtn.classList.add("active");
+        }
 
-        // Optional: Iframe beim Klick neu laden für frische Daten
+        // NEU: Im Browser-Speicher merken, welcher Tab offen ist
+        localStorage.setItem('lastActiveTab', tabId);
+
+        // Iframe beim Klick neu laden für frische Daten
         const frame = document.querySelector(`#${tabId} iframe`);
-        if(frame) frame.src = frame.src;
+        if(frame) {
+            // Timestamp anhängen, um Cache zu umgehen
+            const currentSrc = new URL(frame.src);
+            currentSrc.searchParams.set('t', new Date().getTime());
+            frame.src = currentSrc.toString();
+        }
     }
 
     function updateClock() {
@@ -264,8 +278,20 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Seite alle 30 Minuten komplett neu laden zur allgemeinen Stabilität
-    setTimeout(() => { location.reload(); }, 15000);
+    // BEIM LADEN: Prüfen, welcher Tab zuletzt offen war
+    window.addEventListener('load', () => {
+        const savedTab = localStorage.getItem('lastActiveTab');
+        if (savedTab && (savedTab === 'u10' || savedTab === 'u11')) {
+            openTab(savedTab);
+        }
+    });
+
+    // Seite alle 30 Minuten komplett neu laden (30 * 60 * 1000)
+    // Durch localStorage bleibt der aktive Tab nach dem Refresh erhalten!
+    setTimeout(() => { 
+        location.reload(); 
+    }, 15000); 
+
 </script>
 
 </body>

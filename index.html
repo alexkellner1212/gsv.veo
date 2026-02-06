@@ -3,92 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LKW Mobile Check-out</title>
+    <title>LKW Mobile Terminal</title>
     <style>
         :root {
             --hanomag-red: #c40d1e;
             --bg: #f3f4f6;
             --card: #ffffff;
+            --success: #10b981;
+            --info: #3b82f6;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg);
             margin: 0;
-            padding: 15px;
+            padding: 10px;
         }
         header {
             background: white;
-            padding: 15px;
+            padding: 10px;
             border-bottom: 3px solid var(--hanomag-red);
-            margin: -15px -15px 15px -15px;
+            margin: -10px -10px 15px -10px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; }
+        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; }
         
+        h2 { 
+            font-size: 0.9rem; 
+            color: #4a4a4a; 
+            text-transform: uppercase; 
+            margin: 20px 5px 10px 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .truck-card {
             background: var(--card);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 5px solid var(--hanomag-red);
-        }
-        .info { flex: 1; }
-        .spedition { font-weight: bold; font-size: 1.1rem; display: block; }
-        .details { font-size: 0.85rem; color: #666; margin-top: 4px; }
-        .time-badge {
-            background: #eee;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            color: #333;
         }
         
-        .btn-checkout {
-            background: #10b981;
+        .ist-card { border-left: 5px solid var(--hanomag-red); }
+        .plan-card { border-left: 5px solid var(--info); }
+
+        .info { flex: 1; }
+        .spedition { font-weight: bold; font-size: 1rem; display: block; }
+        .details { font-size: 0.8rem; color: #666; margin-top: 2px; }
+        
+        .btn {
             color: white;
             border: none;
-            padding: 12px 18px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            margin-left: 10px;
             -webkit-tap-highlight-color: transparent;
         }
-        .btn-checkout:active { background: #059669; transform: scale(0.95); }
+        
+        .btn-checkout { background: var(--success); }
+        .btn-checkin { background: var(--info); }
+        
+        .btn:active { opacity: 0.8; transform: scale(0.95); }
 
-        #empty-msg {
+        .empty-msg {
             text-align: center;
             color: #999;
-            margin-top: 50px;
-            display: none;
+            font-size: 0.8rem;
+            padding: 10px;
         }
         
         .badge-in { color: #065f46; font-weight: bold; }
         .badge-out { color: #92400e; font-weight: bold; }
+        .time-badge { background: #eee; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Hof-Bestand (Ist)</h1>
-    <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">Nur aktive LKW im Werk</div>
+    <h1>Logistik Terminal Mobil</h1>
 </header>
 
-<div id="truck-list"></div>
-<div id="empty-msg">Aktuell keine LKW auf dem Hof.</div>
+<main>
+    <h2>🔴 Im Werk (Abmelden)</h2>
+    <div id="ist-list"></div>
+
+    <hr style="border: 0; border-top: 1px solid #ccc; margin: 25px 0;">
+
+    <h2>🔵 Heute geplant (Einchecken)</h2>
+    <div id="plan-list"></div>
+</main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDJBsp7utlNUw4wgHsQOyznV7ioaqY76OQ",
@@ -102,81 +119,125 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const truckListDiv = document.getElementById('truck-list');
-    const emptyMsg = document.getElementById('empty-msg');
+    const istListDiv = document.getElementById('ist-list');
+    const planListDiv = document.getElementById('plan-list');
 
-    // Echtzeit-Überwachung der Logs
+    // Echtzeit-Überwachung
     onSnapshot(collection(db, "logs"), (snapshot) => {
         const logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderMobileList(logs);
+        renderIstList(logs);
     });
 
-    function renderMobileList(logs) {
+    onSnapshot(collection(db, "plans"), (snapshot) => {
+        const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderPlanList(plans);
+    });
+
+    // RENDER: LKW IM WERK
+    function renderIstList(logs) {
         const todayStr = new Date().toISOString().split('T')[0];
-        // Nur LKW von heute, die noch NICHT abgemeldet sind
-        const activeTrucks = logs.filter(l => l.date === todayStr && !l.departureTime)
-                                 .sort((a, b) => b.time.localeCompare(a.time));
+        const active = logs.filter(l => l.date === todayStr && !l.departureTime)
+                           .sort((a, b) => b.time.localeCompare(a.time));
 
-        truckListDiv.innerHTML = '';
-        
-        if (activeTrucks.length === 0) {
-            emptyMsg.style.display = 'block';
-            return;
-        }
-        emptyMsg.style.display = 'none';
+        istListDiv.innerHTML = active.length === 0 ? '<div class="empty-msg">Keine LKW im Werk</div>' : '';
 
-        activeTrucks.forEach(truck => {
+        active.forEach(truck => {
             const card = document.createElement('div');
-            card.className = 'truck-card';
-            
+            card.className = 'truck-card ist-card';
             const typeLabel = truck.type === 'Anlieferung' ? '<span class="badge-in">IN</span>' : '<span class="badge-out">OUT</span>';
 
             card.innerHTML = `
                 <div class="info">
                     <span class="spedition">${truck.spedition}</span>
                     <div class="details">
-                        <span class="time-badge">${truck.time}</span> | ${typeLabel} | <b>${truck.plate || '?'}</b><br>
-                        ${truck.ware || ''}
+                        <span class="time-badge">${truck.time}</span> | ${typeLabel} | <b>${truck.plate || '?'}</b>
                     </div>
                 </div>
-                <button class="btn-checkout" onclick="mobileCheckout('${truck.id}', '${truck.time}', '${truck.spedition}')">Abmelden</button>
+                <button class="btn btn-checkout" onclick="mobileCheckout('${truck.id}', '${truck.time}', '${truck.spedition}')">Abmelden</button>
             `;
-            truckListDiv.appendChild(card);
+            istListDiv.appendChild(card);
         });
     }
 
+    // RENDER: GEPLANTE LKW
+    function renderPlanList(plans) {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todayPlans = plans.filter(p => p.date === todayStr)
+                                .sort((a, b) => a.time.localeCompare(b.time));
+
+        planListDiv.innerHTML = todayPlans.length === 0 ? '<div class="empty-msg">Keine Planungen für heute</div>' : '';
+
+        todayPlans.forEach(plan => {
+            const card = document.createElement('div');
+            card.className = 'truck-card plan-card';
+            const typeLabel = plan.type === 'Anlieferung' ? '<span class="badge-in">IN</span>' : '<span class="badge-out">OUT</span>';
+
+            card.innerHTML = `
+                <div class="info">
+                    <span class="spedition">${plan.spedition}</span>
+                    <div class="details">
+                        Plan: <span class="time-badge">${plan.time}</span> | ${typeLabel} | ${plan.ware || ''}
+                    </div>
+                </div>
+                <button class="btn btn-checkin" onclick="mobileCheckin('${plan.id}')">Ankunft</button>
+            `;
+            planListDiv.appendChild(card);
+        });
+    }
+
+    // FUNKTION: ABMELDEN
     window.mobileCheckout = async (id, startTime, spedition) => {
         const nowTime = new Date().toTimeString().substring(0,5);
-        
-        // Mobile-optimierte Abfrage
-        const userTime = prompt(`Abfahrt für ${spedition}:\nJetzt (${nowTime}) oder andere Zeit? (HH:mm)`, nowTime);
-        
+        const userTime = prompt(`Abfahrt für ${spedition}:\nWann ist er gefahren?`, nowTime);
         if (!userTime) return;
 
-        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-        if (!timeRegex.test(userTime)) {
-            alert("Format HH:mm nutzen!");
-            return;
-        }
-
         const duration = calculateDuration(startTime, userTime);
-        
         try {
-            await updateDoc(doc(db, "logs", id), {
-                departureTime: userTime,
-                duration: duration
-            });
-        } catch (e) {
-            alert("Fehler beim Speichern!");
-        }
+            await updateDoc(doc(db, "logs", id), { departureTime: userTime, duration: duration });
+        } catch (e) { alert("Fehler!"); }
     };
 
+    // FUNKTION: EINLOGGEN (VON PLAN ZU IST)
+    window.mobileCheckin = async (id) => {
+        if(!confirm("LKW jetzt als 'Ist da' erfassen?")) return;
+        
+        // Finde den Plan-Eintrag lokal (bereits geladen)
+        // Hinweis: In einer idealen App würde man hier nochmal aus DB ziehen
+        // aber für die mobile Version reicht das lokale Array.
+        onSnapshot(doc(db, "plans", id), async (docSnap) => {
+            if (!docSnap.exists()) return;
+            const p = docSnap.data();
+            const now = new Date();
+            const curTime = now.toTimeString().substring(0,5);
+            
+            const logEntry = {
+                spedition: p.spedition, plate: p.plate || '?', ware: p.ware,
+                type: p.type, date: now.toISOString().split('T')[0],
+                time: curTime, shift: calculateShift(curTime),
+                departureTime: null, duration: null, fromPlanId: id
+            };
+
+            try {
+                await addDoc(collection(db, "logs"), logEntry);
+                await deleteDoc(doc(db, "plans", id));
+            } catch (e) { console.error(e); }
+        }, { once: true });
+    };
+
+    // HELPERS
     function calculateDuration(start, end) {
         const [h1, m1] = start.split(':').map(Number), [h2, m2] = end.split(':').map(Number);
         let diff = (h2*60+m2) - (h1*60+m1);
         if(diff < 0) diff += 1440;
         const h = Math.floor(diff/60), m = diff%60;
         return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    }
+
+    function calculateShift(timeStr) {
+        const h = parseInt(timeStr.split(':')[0]);
+        if(h>=6 && h<14) return "Früh";
+        if(h>=14 && h<22) return "Spät";
+        return "Nacht";
     }
 </script>
 

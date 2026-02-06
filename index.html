@@ -18,6 +18,26 @@
             margin: 0;
             padding: 10px;
         }
+
+        /* LOGIN OVERLAY */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #1a1a1a; z-index: 10000; display: flex; 
+            align-items: center; justify-content: center;
+        }
+        .login-box {
+            background: white; padding: 25px; border-radius: 12px; width: 85%; max-width: 300px; 
+            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .login-input {
+            width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; 
+            border-radius: 6px; box-sizing: border-box; font-size: 16px;
+        }
+        .login-btn {
+            width: 100%; padding: 12px; background: var(--hanomag-red); color: white; 
+            border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px;
+        }
+
         header {
             background: white;
             padding: 10px;
@@ -62,7 +82,7 @@
         .btn {
             color: white;
             border: none;
-            padding: 10px 14px;
+            padding: 12px 14px;
             border-radius: 6px;
             font-weight: bold;
             font-size: 0.85rem;
@@ -89,11 +109,21 @@
 </head>
 <body>
 
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="margin-top:0; color:#333;">Mobil Login</h2>
+        <input type="text" id="login-user" value="Logistik" class="login-input" readonly>
+        <input type="password" id="login-pass" placeholder="Passwort" class="login-input" autofocus>
+        <button onclick="handleLogin()" class="login-btn">Anmelden</button>
+        <p id="login-error" style="color:red; font-size:12px; margin-top:10px; display:none;">Passwort falsch!</p>
+    </div>
+</div>
+
 <header>
     <h1>Logistik Terminal Mobil</h1>
 </header>
 
-<main>
+<main id="main-content" style="display:none;">
     <h2>🔴 Im Werk (Abmelden)</h2>
     <div id="ist-list"></div>
 
@@ -101,7 +131,34 @@
 
     <h2>🔵 Heute geplant (Einchecken)</h2>
     <div id="plan-list"></div>
+    
+    <button onclick="logout()" style="width:100%; margin-top:30px; padding:10px; background:#4a4a4a; color:white; border:none; border-radius:6px;">Abmelden</button>
 </main>
+
+<script>
+    function handleLogin() {
+        const pass = document.getElementById('login-pass').value;
+        if(pass === "2013!") {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            sessionStorage.setItem('mobileLoggedIn', 'true');
+        } else {
+            document.getElementById('login-error').style.display = 'block';
+        }
+    }
+
+    function logout() {
+        sessionStorage.removeItem('mobileLoggedIn');
+        location.reload();
+    }
+
+    window.onload = function() {
+        if(sessionStorage.getItem('mobileLoggedIn') === 'true') {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        }
+    }
+</script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -122,7 +179,6 @@
     const istListDiv = document.getElementById('ist-list');
     const planListDiv = document.getElementById('plan-list');
 
-    // Echtzeit-Überwachung
     onSnapshot(collection(db, "logs"), (snapshot) => {
         const logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderIstList(logs);
@@ -133,7 +189,6 @@
         renderPlanList(plans);
     });
 
-    // RENDER: LKW IM WERK
     function renderIstList(logs) {
         const todayStr = new Date().toISOString().split('T')[0];
         const active = logs.filter(l => l.date === todayStr && !l.departureTime)
@@ -159,7 +214,6 @@
         });
     }
 
-    // RENDER: GEPLANTE LKW
     function renderPlanList(plans) {
         const todayStr = new Date().toISOString().split('T')[0];
         const todayPlans = plans.filter(p => p.date === todayStr)
@@ -176,7 +230,7 @@
                 <div class="info">
                     <span class="spedition">${plan.spedition}</span>
                     <div class="details">
-                        Plan: <span class="time-badge">${plan.time}</span> | ${typeLabel} | ${plan.ware || ''}
+                        Plan: <span class="time-badge">${plan.time}</span> | ${typeLabel}
                     </div>
                 </div>
                 <button class="btn btn-checkin" onclick="mobileCheckin('${plan.id}')">Ankunft</button>
@@ -185,7 +239,6 @@
         });
     }
 
-    // FUNKTION: ABMELDEN
     window.mobileCheckout = async (id, startTime, spedition) => {
         const nowTime = new Date().toTimeString().substring(0,5);
         const userTime = prompt(`Abfahrt für ${spedition}:\nWann ist er gefahren?`, nowTime);
@@ -197,13 +250,9 @@
         } catch (e) { alert("Fehler!"); }
     };
 
-    // FUNKTION: EINLOGGEN (VON PLAN ZU IST)
     window.mobileCheckin = async (id) => {
         if(!confirm("LKW jetzt als 'Ist da' erfassen?")) return;
         
-        // Finde den Plan-Eintrag lokal (bereits geladen)
-        // Hinweis: In einer idealen App würde man hier nochmal aus DB ziehen
-        // aber für die mobile Version reicht das lokale Array.
         onSnapshot(doc(db, "plans", id), async (docSnap) => {
             if (!docSnap.exists()) return;
             const p = docSnap.data();
@@ -224,7 +273,6 @@
         }, { once: true });
     };
 
-    // HELPERS
     function calculateDuration(start, end) {
         const [h1, m1] = start.split(':').map(Number), [h2, m2] = end.split(':').map(Number);
         let diff = (h2*60+m2) - (h1*60+m1);

@@ -2,292 +2,1397 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LKW Mobile Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LKW Logistik Leitstand Hanomag Verbund">
+    <title>Logistikleitstand Hanomag - Baunatal, Kassel & Schichtbuch</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* --- CSS STYLING (HANOMAG DESIGN OPTIMIZED) --- */
         :root {
-            --hanomag-red: #c40d1e;
-            --bg: #f3f4f6;
-            --card: #ffffff;
+            --hanomag-red: #c40d1e; 
+            --hanomag-dark: #1a1a1a;
+            --hanomag-gray: #4a4a4a;
+            --primary: var(--hanomag-red); 
+            --bg: #f3f4f6; 
+            --card-bg: #ffffff;
+            --text: #333333; 
+            --danger: #ef4444; 
             --success: #10b981;
-            --info: #3b82f6;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 10px;
+            --warning: #f59e0b; 
+            --future: #6366f1; 
+            --info: #0ea5e9; 
+            --intern: #8b5cf6;
         }
 
-        /* LOGIN OVERLAY */
+        body { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 0; 
+            padding-bottom: 60px;
+        }
+
+        /* LOGIN OVERLAY STYLES */
         #login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #1a1a1a; z-index: 10000; display: flex; 
-            align-items: center; justify-content: center;
+            align-items: center; justify-content: center; font-family: sans-serif;
         }
         .login-box {
-            background: white; padding: 25px; border-radius: 12px; width: 85%; max-width: 300px; 
+            background: white; padding: 30px; border-radius: 8px; width: 320px; 
             text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
         .login-input {
-            width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; 
-            border-radius: 6px; box-sizing: border-box; font-size: 16px;
+            width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; 
+            border-radius: 4px; box-sizing: border-box;
         }
         .login-btn {
-            width: 100%; padding: 12px; background: var(--hanomag-red); color: white; 
-            border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px;
+            width: 100%; padding: 12px; background: #c40d1e; color: white; 
+            border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
         }
-
-        header {
-            background: white;
-            padding: 10px;
-            border-bottom: 3px solid var(--hanomag-red);
-            margin: -10px -10px 15px -10px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; }
         
-        h2 { 
-            font-size: 0.9rem; 
-            color: #4a4a4a; 
-            text-transform: uppercase; 
-            margin: 20px 5px 10px 5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .truck-card {
-            background: var(--card);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        /* HEADER BEREICH */
+        header.main-header {
+            background-color: #fff;
+            padding: 15px 40px;
+            border-bottom: 4px solid var(--hanomag-red);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-logo-title {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        h1 { 
+            margin: 0; 
+            font-size: 1.8rem; 
+            color: var(--hanomag-dark);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .ist-card { border-left: 5px solid var(--hanomag-red); }
-        .plan-card { border-left: 5px solid var(--info); }
+        .sub-header {
+            font-size: 0.9rem;
+            color: var(--hanomag-gray);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        .info { flex: 1; }
-        .spedition { font-weight: bold; font-size: 1rem; display: block; }
-        .details { font-size: 0.8rem; color: #666; margin-top: 2px; }
-        
-        .btn {
-            color: white;
+        /* LOCATION SWITCHER */
+        .location-switch {
+            display: flex;
+            background: #e5e7eb;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+            justify-content: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .loc-btn {
+            flex: 1;
+            padding: 10px 20px;
             border: none;
-            padding: 12px 14px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.85rem;
+            background: transparent;
             cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
+            font-weight: 800;
+            color: #6b7280;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        
-        .btn-checkout { background: var(--success); }
-        .btn-checkin { background: var(--info); }
-        
-        .btn:active { opacity: 0.8; transform: scale(0.95); }
+        .loc-btn.active {
+            background: #fff;
+            color: var(--hanomag-red);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .loc-btn:hover:not(.active) {
+            background: #e5e7eb;
+            color: #333;
+        }
 
-        .empty-msg {
+        /* CONTAINER */
+        main.container { max-width: 1800px; margin: 0 auto; padding: 0 20px; }
+        
+        .view-section { display: none; animation: fadeIn 0.4s; }
+        .view-section.active { display: block; }
+
+        h2 { margin-top: 0; font-size: 1.25rem; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; color: var(--hanomag-dark); }
+        h3 { margin-top: 0; color: var(--hanomag-red); display: flex; align-items: center; gap: 10px; }
+        h4 { color: var(--hanomag-dark); margin-bottom: 10px; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 20px; }
+        .full-width { grid-column: 1 / -1; }
+        
+        section.card { 
+            background: var(--card-bg); 
+            padding: 20px; 
+            border-radius: 6px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+            margin-bottom: 20px; 
+            border-top: 4px solid transparent;
+            transition: transform 0.2s;
+        }
+        section.card:hover { border-top-color: var(--hanomag-red); transform: translateY(-2px); }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 700; font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box; background: #f9fafb; font-size: 14px; transition: border 0.2s; }
+        input:focus, select:focus { border-color: var(--hanomag-red); outline: none; background: #fff; box-shadow: 0 0 0 2px rgba(196, 13, 30, 0.1); }
+        
+        .search-box { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 16px; background-color: #fff; }
+        
+        /* TABS */
+        nav.tab-header { display: flex; border-bottom: 2px solid #e5e7eb; margin-bottom: 20px; }
+        .tab-btn { 
+            flex: 1; padding: 12px; cursor: pointer; text-align: center; background: transparent; 
+            border: none; border-bottom: 2px solid transparent; font-weight: 700; color: #6b7280; font-size: 1.0em;
+            transition: all 0.2s; margin-bottom: -2px;
+        }
+        .tab-btn:hover { color: var(--hanomag-red); background-color: #fef2f2; }
+        .tab-btn.active { border-bottom-color: var(--hanomag-red); color: var(--hanomag-red); background: transparent; }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* SCHICHTBUCH */
+        .sb-tabs .tab-btn { font-size: 0.95em; padding: 8px; }
+        .sb-container { display: none; }
+        .sb-container.active { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; animation: fadeIn 0.3s; }
+        .sb-col h4 { margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        .sb-area {
+            width: 100%; height: 350px; padding: 15px; border: 1px solid #ccc;
+            border-radius: 4px; font-family: inherit; font-size: 15px; resize: vertical; box-sizing: border-box;
+            line-height: 1.5;
+        }
+        .sb-early { border-left: 4px solid #93c5fd; background-color: #eff6ff; }
+        .sb-late { border-left: 4px solid #c4b5fd; background-color: #f5f3ff; }
+
+        /* BUTTONS */
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; color: white; transition: 0.2s; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn:hover { filter: brightness(110%); }
+        .btn:active { transform: translateY(1px); }
+
+        .btn-primary { background-color: var(--hanomag-red); width: 100%; font-size: 16px; padding: 12px; }
+        .btn-success { background-color: #10b981; }
+        .btn-danger { background-color: #ef4444; }
+        .btn-info { background-color: #0ea5e9; }
+        .btn-intern { background-color: var(--hanomag-dark); font-weight: bold; }
+        .btn-export { background-color: #059669; margin-right: 10px;}
+        .btn-info-window { background-color: var(--hanomag-red); margin-right: 10px; color: #fff;}
+        .btn-done { background-color: #4b5563; }
+        .btn-small { padding: 4px 10px; font-size: 12px; }
+        .btn-icon { width: 32px; height: 32px; padding: 0; font-size: 16px; }
+        
+        .btn-add { 
+            background-color: #10b981; width: 100%; height: 30px; font-size: 18px; 
+            display: flex; align-items: center; justify-content: center; border-radius: 4px; color: white; cursor: pointer; border: none;
+        }
+        .btn-remove-tour {
+            background-color: #fee2e2; color: #ef4444; border: 1px solid #fecaca;
+            width: 20px; height: 20px; border-radius: 50%; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+            position: absolute; top: -5px; right: -5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .btn-remove-tour:hover { background-color: #ef4444; color: white; }
+
+        .btn-standard-size {
+            width: 190px;
+            height: 75px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 1.2;
             text-align: center;
-            color: #999;
-            font-size: 0.8rem;
-            padding: 10px;
+            box-shadow: 0 10px 15px -3px rgba(196, 13, 30, 0.3);
+            background: linear-gradient(135deg, var(--hanomag-red) 0%, #a00b18 100%) !important;
+        }
+
+        /* SCHNELLWAHL LAYOUT */
+        .quick-select-container { 
+            display: flex; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+            margin-bottom: 12px; 
+            align-items: flex-start; 
         }
         
-        .badge-in { color: #065f46; font-weight: bold; }
-        .badge-out { color: #92400e; font-weight: bold; }
-        .time-badge { background: #eee; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
+        .product-group {
+            display: flex;
+            gap: 5px;
+            background: #ffffff;
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .product-label {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-align: center;
+            font-weight: bold;
+            color: var(--hanomag-red);
+            font-size: 12px;
+            padding: 4px;
+            border-left: 3px solid var(--hanomag-red);
+            background: #fff0f0;
+            border-radius: 2px;
+        }
+
+        .btn-pair-col {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .btn-quick {
+            background-color: #f3f4f6; color: #374151; border: 1px solid #d1d5db;
+            border-radius: 4px; padding: 6px 10px; font-size: 12px; cursor: pointer; transition: all 0.2s;
+            white-space: nowrap; width: 100px; text-align: center; font-weight: 600;
+        }
+        .btn-quick:hover { background-color: var(--hanomag-red); color: white; border-color: var(--hanomag-red); }
+        .btn-quick-header { font-size: 10px; color: #6b7280; text-align: center; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; }
+
+        /* TABELLE */
+        .table-wrapper { overflow-x: auto; border-radius: 4px; border: 1px solid #e5e7eb; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        
+        th { 
+            background-color: #1f2937; 
+            color: #fff; 
+            font-weight: 600; 
+            font-size: 0.85em; 
+            text-transform: uppercase; 
+            padding: 12px; 
+            text-align: left;
+            position: sticky; 
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.2);
+        }
+        
+        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; font-size: 0.95em; color: #333; }
+        tr:last-child td { border-bottom: none; }
+        
+        /* Progress Bar */
+        .progress-wrapper {
+            width: 100%;
+            background: #e5e7eb;
+            border-radius: 4px;
+            height: 22px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+            white-space: nowrap;
+        }
+        .bg-red { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .bg-orange { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .bg-green { background: linear-gradient(90deg, #10b981, #059669); }
+        
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: bold; display: inline-block; min-width: 60px; text-align: center; }
+        .in { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .out { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .intern { background-color: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+        
+        @keyframes pulse-red {
+            0% { box-shadow: inset 5px 0 0 0 #fee2e2; }
+            50% { box-shadow: inset 5px 0 0 0 #ef4444; background-color: #fef2f2; }
+            100% { box-shadow: inset 5px 0 0 0 #fee2e2; }
+        }
+        .row-overdue { animation: pulse-red 2s infinite; }
+        
+        .row-finished { background-color: #f9fafb; color: #9ca3af; }
+        .row-finished strong { color: #6b7280; text-decoration: line-through; }
+        .row-finished .badge { filter: grayscale(1); opacity: 0.7; }
+
+        .row-vw-hujer { background-color: #eff6ff; border-left: 4px solid #3b82f6; } 
+        .row-hujer-hh { background-color: #fbf7ff; border-left: 4px solid #a855f7; } 
+
+        .table-input { width: 100%; min-width: 60px; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.9em; background: #fff; transition: all 0.2s; }
+        .table-input:focus { border-color: var(--hanomag-red); outline: none; box-shadow: 0 0 0 2px rgba(196, 13, 30, 0.1); }
+
+        .extra-wrapper { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+        .extra-box { position: relative; width: 60px; }
+        .tour-cell { display: flex; flex-direction: column; gap: 2px; }
+        .driver-select-small { font-size: 10px; padding: 1px; height: 18px; border: 1px solid #eee; border-radius: 2px; background: #fafafa; color: #666; width: 100%; }
+
+        /* STATS & CHART */
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: var(--card-bg); padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid var(--hanomag-red); position: relative; overflow: hidden; }
+        .stat-label { font-size: 0.85em; text-transform: uppercase; color: #6b7280; font-weight: 700; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+        .stat-number { font-size: 32px; font-weight: 800; display: block; color: var(--hanomag-dark); line-height: 1; }
+        .chart-container { position: relative; height: 250px; width: 100%; }
+        
+        /* FOOTER */
+        footer.main-footer {
+            background-color: #111;
+            color: #9ca3af;
+            padding: 30px 40px;
+            margin-top: 40px;
+            font-size: 0.8rem;
+            text-align: center;
+            border-top: 4px solid var(--hanomag-red);
+        }
+        footer.main-footer a { color: #d1d5db; text-decoration: none; margin: 0 10px; transition: color 0.2s; }
+        footer.main-footer a:hover { color: #fff; text-decoration: underline; }
+
+        /* INFO WINDOW */
+        #info-window {
+            position: fixed; top: 100px; right: 20px; width: 320px; height: 260px;
+            background: #fff; border: none; border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); display: none; z-index: 2000;
+            flex-direction: column; overflow: hidden; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        #info-header {
+            background: var(--hanomag-red); color: white; padding: 12px; display: flex; 
+            justify-content: space-between; align-items: center; font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* INVENTUR LZ KASSEL SPECIFIC */
+        #invTableBody tr { cursor: pointer; transition: background 0.1s; }
+        #invTableBody tr:hover { background-color: #fef2f2; }
+
+        @media (max-width: 900px) { .dashboard-grid, .stats-row, .sb-container.active { grid-template-columns: 1fr; } }
+        #loading-indicator { 
+            position: fixed; top: 85px; right: 20px; background: #fff; padding: 8px 15px; 
+            border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 13px; 
+            display: none; z-index: 1000; color: var(--hanomag-red); font-weight: bold;
+            border: 1px solid #fce7f3;
+            animation: spinPulse 1s infinite alternate;
+        }
+        @keyframes spinPulse { from { transform: scale(1); } to { transform: scale(1.05); } }
     </style>
 </head>
 <body>
 
 <div id="login-overlay">
     <div class="login-box">
-        <h2 style="margin-top:0; color:#333;">Mobil Login</h2>
-        <input type="text" id="login-user" value="Logistik" class="login-input" readonly>
-        <input type="password" id="login-pass" placeholder="Passwort" class="login-input" autofocus>
+        <img src="https://www.haertecenter.de/typo3conf/ext/hanomag/Resources/Public/Images/image002.jpg" style="width:180px; margin-bottom:20px;">
+        <h2 style="margin-bottom:20px; color:#333;">Logistik Login</h2>
+        <input type="text" id="login-user" placeholder="Login" class="login-input">
+        <input type="password" id="login-pass" placeholder="Passwort" class="login-input">
         <button onclick="handleLogin()" class="login-btn">Anmelden</button>
-        <p id="login-error" style="color:red; font-size:12px; margin-top:10px; display:none;">Passwort falsch!</p>
+        <p id="login-error" style="color:red; font-size:12px; margin-top:10px; display:none;">Login oder Passwort falsch!</p>
     </div>
 </div>
 
-<header>
-    <h1>Logistik Terminal Mobil</h1>
+<div id="loading-indicator">🔄 Daten werden synchronisiert...</div>
+
+<div id="info-window">
+    <div id="info-header">
+        <span>📢 Live-Info / Aushang</span>
+        <span style="cursor:pointer; opacity:0.8;" onclick="window.toggleInfo()">✕</span>
+    </div>
+    <div id="info-content" style="flex:1; padding:0;">
+        <textarea id="global-info-text" style="width:100%; height:100%; border:none; resize:none; outline:none; padding: 15px; font-family: inherit; font-size: 15px; background: #fffdfd;" placeholder="Wichtige Info für alle hier eintippen..." oninput="window.saveGlobalInfo()"></textarea>
+    </div>
+    <div style="padding:6px 12px; background:#f3f4f6; font-size:0.7em; text-align:right; color:#6b7280; border-top:1px solid #e5e7eb;">
+        Wird in Echtzeit gespeichert
+    </div>
+</div>
+
+<header class="main-header">
+    <div class="header-logo-title">
+        <img src="https://www.haertecenter.de/typo3conf/ext/hanomag/Resources/Public/Images/image002.jpg" alt="HANOMAG Logo" style="height: 55px; margin-bottom: 8px; object-fit: contain; align-self: flex-start;">
+        <h1>Logistikleitstand</h1>
+        <span class="sub-header">
+            <span id="headerLocationTitle">Werk Baunatal</span>
+            <span style="width: 4px; height: 4px; background: #ccc; border-radius: 50%;"></span>
+            <span id="headerClock">--:--</span>
+        </span>
+    </div>
+    <div style="display:flex; gap:10px;">
+        <button onclick="window.toggleInfo()" class="btn btn-info-window btn-small" title="Öffnet das Info-Fenster">📢 Live-Info</button>
+        <button onclick="window.exportToCSV()" class="btn btn-export btn-small" title="Tabelle als CSV speichern">💾 Excel Export</button>
+        <button onclick="logout()" class="btn btn-small" style="background:#4a4a4a;">Abmelden</button>
+    </div>
 </header>
 
-<main id="main-content" style="display:none;">
-    <h2>🔴 Im Werk (Abmelden)</h2>
-    <div id="ist-list"></div>
+<main class="container">
 
-    <hr style="border: 0; border-top: 1px solid #ccc; margin: 25px 0;">
+    <nav class="location-switch">
+        <button class="loc-btn active" onclick="window.switchLocation('baunatal')">📍 Werk Baunatal</button>
+        <button class="loc-btn" onclick="window.switchLocation('kassel')">📦 LZ Kassel</button>
+        <button class="loc-btn" onclick="window.switchLocation('schichtbuch')">📖 Schichtbuch</button>
+    </nav>
 
-    <h2>🔵 Heute geplant (Einchecken)</h2>
-    <div id="plan-list"></div>
-    
-    <button onclick="logout()" style="width:100%; margin-top:30px; padding:10px; background:#4a4a4a; color:white; border:none; border-radius:6px;">Abmelden</button>
+    <div id="view-baunatal" class="view-section active">
+
+        <section class="stats-row" aria-label="Statistiken">
+            <article class="stat-box" style="border-left-color: #2563eb;">
+                <span class="stat-label">Frühschicht</span><span class="stat-number" id="stat-early">0</span>
+            </article>
+            <article class="stat-box" style="border-left-color: #7c3aed;">
+                <span class="stat-label">Spätschicht</span><span class="stat-number" id="stat-late">0</span>
+            </article>
+            <article class="stat-box" style="border-left-color: #c40d1e;">
+                <span class="stat-label">Stoßzeit</span><span class="stat-number" id="stat-peak">-</span>
+            </article>
+        </section>
+
+        <section class="card full-width">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3>📈 Auslastung & Planung</h3>
+                <div style="font-size:12px; display:flex; gap:15px;">
+                    <span style="display:flex; align-items:center; gap:5px;"><span style="width:12px; height:3px; background:#c40d1e;"></span> Ist (LKW)</span>
+                    <span style="display:flex; align-items:center; gap:5px;">🚚 Geplant (LKW)</span>
+                </div>
+            </div>
+            <div class="chart-container"><canvas id="frequencyChart"></canvas></div>
+        </section>
+
+        <div class="dashboard-grid">
+            <section class="card">
+                <nav class="tab-header">
+                    <button class="tab-btn active" onclick="window.switchTab(this, 'tab-input-sofort')">⚡ Sofort-Erfassung</button>
+                    <button class="tab-btn" onclick="window.switchTab(this, 'tab-input-plan')">📅 Neu Planen</button>
+                </nav>
+
+                <div id="tab-input-sofort" class="tab-content active">
+                    <form id="logForm">
+                        <div class="form-group"><label>Uhrzeit</label><input type="time" id="logTime" required></div>
+                        <div class="form-group">
+                            <label>Spedition</label>
+                            <div class="quick-select-container" style="gap:5px;">
+                                <button type="button" class="btn btn-quick" style="width:auto;" onclick="window.fillInput('logSpedition', 'Delta Trans')">Delta Trans</button>
+                                <button type="button" class="btn btn-quick" style="width:auto;" onclick="window.fillInput('logSpedition', 'Kampe')">Kampe</button>
+                                <button type="button" class="btn btn-quick" style="width:auto;" onclick="window.fillInput('logSpedition', 'Rudolph')">Rudolph</button>
+                                <button type="button" class="btn btn-quick" style="width:auto;" onclick="window.fillInput('logSpedition', 'PraPol')">PraPol</button>
+                                <button type="button" class="btn btn-quick" style="width:auto;" onclick="window.fillInput('logSpedition', 'Mikus')">Mikus</button>
+                            </div>
+                            <input type="text" id="logSpedition" placeholder="z.B. Rudolph etc. (oder oben wählen)" required>
+                        </div>
+                        <div class="form-group"><label>Kennzeichen</label><input type="text" id="logPlate" placeholder="K-AB 123"></div>
+                        <div class="form-group"><label>Ware</label><input type="text" id="logWare" placeholder="Leergut etc..." required></div>
+                        <div class="form-group"><label>Vorgang</label>
+                            <select id="logType"><option value="Anlieferung">Anlieferung (IN)</option><option value="Abholung">Abholung (OUT)</option></select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">LKW Erfassen</button>
+                    </form>
+                </div>
+
+                <div id="tab-input-plan" class="tab-content">
+                    <form id="planForm">
+                        <div class="form-group"><label>Datum</label><input type="date" id="planDate" required></div>
+                        <div class="form-group">
+                            <label>Geplante Uhrzeit (15-Min Takt)</label>
+                            <div style="display:flex; gap:10px;">
+                                <select id="planHour" style="width:50%" onchange="window.updatePlanTime()"></select>
+                                <select id="planMinute" style="width:50%" onchange="window.updatePlanTime()">
+                                    <option value="00">00</option><option value="15">15</option>
+                                    <option value="30">30</option><option value="45">45</option>
+                                </select>
+                            </div>
+                            <input type="hidden" id="planTime">
+                        </div>
+                        <div class="form-group"><label>Spedition</label><input type="text" id="planSpedition" required></div>
+                        <div class="form-group"><label>Kennzeichen</label><input type="text" id="planPlate" placeholder="Optional"></div>
+                        <div class="form-group"><label>Ware</label><input type="text" id="planWare" required></div>
+                        <div class="form-group"><label>Vorgang</label>
+                            <select id="planType"><option value="Anlieferung">Anlieferung</option><option value="Abholung">Abholung</option></select>
+                        </div>
+                        <button type="submit" class="btn btn-success" style="width:100%; background-color: #4b5563;">Vormerken</button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="card">
+                <nav class="tab-header">
+                    <button class="tab-btn active" onclick="window.switchTab(this, 'tab-view-historie')">Heute (Ist)</button>
+                    <button class="tab-btn" onclick="window.switchTab(this, 'tab-view-geplant')">Heute (Plan)</button>
+                </nav>
+
+                <div id="tab-view-historie" class="tab-content active">
+                    <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+                        <button onclick="window.addInternalLog()" class="btn btn-intern btn-small">🚛 Interner Transport +1</button>
+                    </div>
+                    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Suche nach Spedition, Kennzeichen oder Ware..." onkeyup="window.renderLogTable()">
+                    <div class="table-wrapper">
+                        <table id="logTable">
+                            <thead>
+                                <tr>
+                                    <th>Zeit</th><th>Typ</th><th>Spedition</th><th>Kennz.</th><th>Ware (Edit)</th><th>Aktion</th><th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="tab-view-geplant" class="tab-content">
+                    <p style="text-align:center; color:#6b7280; font-size:0.9em; margin-bottom:10px;">Diese LKW werden heute erwartet:</p>
+                    <div class="table-wrapper">
+                        <table id="planTableToday"><thead><tr><th>Zeit</th><th>Status</th><th>Vorgang</th><th>Spedition</th><th>Kennz. (Edit)</th><th>Ware</th><th>Aktion</th></tr></thead><tbody></tbody></table>
+                    </div>
+                    <p id="noTodayMsg" style="text-align:center; color:#999; display:none; padding:20px;">Nichts geplant.</p>
+                </div>
+            </section>
+        </div>
+
+        <section class="card full-width" style="border-top: 5px solid #c40d1e;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h3>🚛 Eigene Regeltransporte (Täglich)</h3>
+                    <span style="font-size:0.9em; color:#6b7280;">Fortschritt wird automatisch berechnet.</span>
+                </div>
+                <button onclick="window.loadStandardRoutes()" class="btn btn-primary btn-standard-size">📋 Liste laden</button>
+            </div>
+
+            <form id="regularForm" style="background:#f3f4f6; padding:20px; border-radius:6px; margin-bottom:25px; display:flex; gap:15px; align-items:flex-end; flex-wrap:wrap; border:1px solid #e5e7eb;">
+                <div style="flex-grow:1;">
+                    <label>Tour manuell hinzufügen (Shortcut wählen)</label>
+                    <div class="quick-select-container">
+                        <div class="product-group">
+                            <div class="product-label">Q7</div>
+                            <div class="btn-pair-col">
+                                <div class="btn-quick-header">VW-Hujer</div>
+                                <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT Q7 FBA Links VW-Hujer', 1232)">Q7 Links</button>
+                                <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT Q7 FBA Rechts VW-Hujer', 1232)">Q7 Rechts</button>
+                            </div>
+                            <div class="btn-pair-col">
+                                <div class="btn-quick-header">Hujer-HH</div>
+                                <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT Q7 FBA Links Hujer-HH', 900)">Q7 Links</button>
+                                <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT Q7 FBA Rechts Hujer-HH', 900)">Q7 Rechts</button>
+                            </div>
+                        </div>
+                        <div class="product-group">
+                            <div class="product-label">T7</div>
+                            <div class="btn-pair-col">
+                                <div class="btn-quick-header">VW-Hujer</div>
+                                <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT T7 FBA Links VW-Hujer', 576)">T7 Links</button>
+                                <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT T7 FBA Rechts VW-Hujer', 512)">T7 Rechts</button>
+                            </div>
+                            <div class="btn-pair-col">
+                                <div class="btn-quick-header">Hujer-HH</div>
+                                <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT T7 FBA Links Hujer-HH', 420)">T7 Links</button>
+                                <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT T7 FBA Rechts Hujer-HH', 420)">T7 Rechts</button>
+                            </div>
+                        </div>
+                        <div class="btn-pair-col" style="justify-content: center;">
+                            <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT MEB (Grüner) VW - M32', 896)">RT MEB</button>
+                            <button type="button" class="btn btn-quick" onclick="window.fillRegular('RT PPE VW - HH', 1260)">RT PPE</button>
+                        </div>
+                    </div>
+                    <input type="text" id="regName" placeholder="Name der Tour (oder oben klicken)" required style="margin-top: 10px;">
+                </div>
+                <div style="width:100px;">
+                    <label>Zielmenge</label>
+                    <input type="number" id="regTarget" placeholder="Menge" required>
+                </div>
+                <button type="submit" class="btn btn-intern" style="height:42px;">Hinzufügen</button>
+            </form>
+
+            <h4>📅 Heute (<span id="dateRegToday"></span>)</h4>
+            <div class="table-wrapper">
+                <table id="regTableToday">
+                    <thead>
+                        <tr>
+                            <th style="width:25%">Tour Name</th>
+                            <th style="width:80px">Ziel</th>
+                            <th style="width:130px">1. Tour</th>
+                            <th style="width:130px">2. Tour</th>
+                            <th style="width:130px">3. Tour</th>
+                            <th>Zusatz</th>
+                            <th style="width:140px">Fortschritt</th>
+                            <th style="width:40px"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <h4 style="margin-top:30px; color:#6b7280;">⏮️ Vortag (<span id="dateRegYesterday"></span>)</h4>
+            <div class="table-wrapper" style="opacity: 0.8;">
+                <table id="regTableYesterday">
+                    <thead>
+                        <tr>
+                            <th style="width:25%">Tour</th>
+                            <th style="width:70px">Soll</th>
+                            <th>1. Tour</th><th>2. Tour</th><th>3. Tour</th>
+                            <th>Zusatz</th>
+                            <th style="width:70px">Rest</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card full-width" style="background-color: #fff; border-top: 5px solid #4b5563;">
+            <h3 style="color: #4b5563;">🔜 Geplant (Zukunft)</h3>
+            <div class="table-wrapper">
+                 <table id="planTableFuture"><thead><tr><th>Datum</th><th>Vorgang</th><th>Spedition</th><th>Kennz. (Edit)</th><th>Ware</th><th>Aktion</th></tr></thead><tbody></tbody></table>
+            </div>
+        </section>
+    </div>
+
+    <div id="view-kassel" class="view-section">
+        <div class="dashboard-grid">
+            <section class="card">
+                <h3>📦 Inventur LZ Kassel</h3>
+                <div class="form-group">
+                    <label>Artikel / Ladungsträger</label>
+                    <input type="text" id="invItemName" placeholder="z.B. Gitterboxen leer (oder unten wählen)">
+                </div>
+                <div class="form-group">
+                    <label>Menge</label>
+                    <input type="number" id="invQty" placeholder="Anzahl">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" style="flex:1" onclick="window.updateInv(true)">+ Zugang</button>
+                    <button class="btn btn-primary" style="flex:1" onclick="window.updateInv(false)">- Abgang</button>
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>🔍 Aktueller Bestand (Kassel)</h3>
+                <input type="text" id="invSearch" class="search-box" placeholder="🔍 Filtern..." onkeyup="window.renderInventory()">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Artikel (Klick zum Wählen)</th><th>Bestand</th><th>Aktion</th></tr>
+                        </thead>
+                        <tbody id="invTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <section class="card full-width">
+            <h3>🕒 Letzte Bewegungen (Inventur)</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>Zeit</th><th>Vorgang</th><th>Artikel</th><th>Menge</th></tr>
+                    </thead>
+                    <tbody id="invHistoryBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div id="view-schichtbuch" class="view-section">
+        <section class="card full-width" style="border-top: 5px solid #c40d1e;">
+            <h2>📖 Digitales Schichtbuch</h2>
+            <nav class="tab-header sb-tabs">
+                <button class="tab-btn active" onclick="window.switchSbTab(this, 'sb-today')">📅 Heute (<span id="sbDate0"></span>)</button>
+                <button class="tab-btn" onclick="window.switchSbTab(this, 'sb-yesterday')">⏮️ Gestern (<span id="sbDate1"></span>)</button>
+                <button class="tab-btn" onclick="window.switchSbTab(this, 'sb-before')">⏮️ Vorgestern (<span id="sbDate2"></span>)</button>
+            </nav>
+
+            <div id="sb-today" class="sb-container active">
+                <div class="sb-col">
+                    <h4 style="color:#2563eb;">☀️ Frühschicht</h4>
+                    <textarea id="sb-early-0" class="sb-area sb-early" placeholder="Besondere Vorkommnisse Frühschicht..." oninput="window.saveShift(0, 'early')"></textarea>
+                </div>
+                <div class="sb-col">
+                    <h4 style="color:#7c3aed;">🌙 Spätschicht</h4>
+                    <textarea id="sb-late-0" class="sb-area sb-late" placeholder="Besondere Vorkommnisse Spätschicht..." oninput="window.saveShift(0, 'late')"></textarea>
+                </div>
+            </div>
+
+            <div id="sb-yesterday" class="sb-container">
+                <div class="sb-col">
+                    <h4 style="color:#2563eb;">☀️ Frühschicht</h4>
+                    <textarea id="sb-early-1" class="sb-area sb-early" oninput="window.saveShift(1, 'early')"></textarea>
+                </div>
+                <div class="sb-col">
+                    <h4 style="color:#7c3aed;">🌙 Spätschicht</h4>
+                    <textarea id="sb-late-1" class="sb-area sb-late" oninput="window.saveShift(1, 'late')"></textarea>
+                </div>
+            </div>
+
+            <div id="sb-before" class="sb-container">
+                <div class="sb-col">
+                    <h4 style="color:#2563eb;">☀️ Frühschicht</h4>
+                    <textarea id="sb-early-2" class="sb-area sb-early" oninput="window.saveShift(2, 'early')"></textarea>
+                </div>
+                <div class="sb-col">
+                    <h4 style="color:#7c3aed;">🌙 Spätschicht</h4>
+                    <textarea id="sb-late-2" class="sb-area sb-late" oninput="window.saveShift(2, 'late')"></textarea>
+                </div>
+            </div>
+        </section>
+    </div>
 </main>
 
+<footer class="main-footer">
+    <p>Impressum | Datenschutz | Compliance | Sitemap | Cookieeinstellungen</p>
+    <p>&copy; 2024 HANOMAG Lohnhärterei Gruppe | Werk Baunatal Logistik & Schichtbuch</p>
+</footer>
+
 <script>
+    // --- LOGIN SYSTEM ---
     function handleLogin() {
+        const user = document.getElementById('login-user').value;
         const pass = document.getElementById('login-pass').value;
-        if(pass === "2013!") {
+        if(user === "Logistik" && pass === "2013!") {
             document.getElementById('login-overlay').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            sessionStorage.setItem('mobileLoggedIn', 'true');
+            sessionStorage.setItem('loggedIn', 'true');
         } else {
             document.getElementById('login-error').style.display = 'block';
         }
     }
 
     function logout() {
-        sessionStorage.removeItem('mobileLoggedIn');
+        sessionStorage.removeItem('loggedIn');
         location.reload();
     }
 
     window.onload = function() {
-        if(sessionStorage.getItem('mobileLoggedIn') === 'true') {
+        if(sessionStorage.getItem('loggedIn') === 'true') {
             document.getElementById('login-overlay').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
         }
     }
 </script>
 
 <script type="module">
+    // --- 1. FIREBASE IMPORTS ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, query, orderBy, where, deleteField, setDoc, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // --- 2. FIREBASE KONFIGURATION ---
     const firebaseConfig = {
         apiKey: "AIzaSyDJBsp7utlNUw4wgHsQOyznV7ioaqY76OQ",
         authDomain: "lkw-trackerneu.firebaseapp.com",
-        projectId: "lkw-trackerneu",
         databaseURL: "https://lkw-trackerneu-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "lkw-trackerneu",
         storageBucket: "lkw-trackerneu.firebasestorage.app",
+        messagingSenderId: "335563014230",
         appId: "1:335563014230:web:284080c578f89595993bf7"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const istListDiv = document.getElementById('ist-list');
-    const planListDiv = document.getElementById('plan-list');
+    let localLog = [];
+    let localPlan = [];
+    let localRegular = [];
+    let localInventory = [];
+    let myChart = null;
+    let shiftDates = []; 
 
-    onSnapshot(collection(db, "logs"), (snapshot) => {
-        const logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderIstList(logs);
+    // --- HELPER FUNCTIONS ---
+    
+    window.switchLocation = (loc) => {
+        document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        
+        if (loc === 'baunatal') {
+            document.querySelector('#view-baunatal').classList.add('active');
+            document.querySelector('.loc-btn:nth-child(1)').classList.add('active');
+            document.getElementById('headerLocationTitle').textContent = "Werk Baunatal";
+        } else if (loc === 'kassel') {
+            document.querySelector('#view-kassel').classList.add('active');
+            document.querySelector('.loc-btn:nth-child(2)').classList.add('active');
+            document.getElementById('headerLocationTitle').textContent = "LZ Kassel | Inventur";
+        } else {
+            document.querySelector('#view-schichtbuch').classList.add('active');
+            document.querySelector('.loc-btn:nth-child(3)').classList.add('active');
+            document.getElementById('headerLocationTitle').textContent = "Digitales Schichtbuch";
+        }
+    };
+
+    // --- KASSEL INVENTUR LOGIK (FIREBASE) ---
+    onSnapshot(collection(db, "inventory_kassel"), (snapshot) => {
+        localInventory = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        window.renderInventory();
     });
 
-    onSnapshot(collection(db, "plans"), (snapshot) => {
-        const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderPlanList(plans);
+    onSnapshot(query(collection(db, "inventory_history"), orderBy("time", "desc"), limit(10)), (snapshot) => {
+        const tbody = document.getElementById('invHistoryBody');
+        tbody.innerHTML = '';
+        snapshot.docs.forEach(docSnap => {
+            const h = docSnap.data();
+            tbody.innerHTML += `<tr><td>${h.time}</td><td><span class="badge ${h.type==='ZUGANG'?'in':'out'}">${h.type}</span></td><td>${h.item}</td><td>${h.qty}</td></tr>`;
+        });
     });
 
-    function renderIstList(logs) {
-        const todayStr = new Date().toISOString().split('T')[0];
-        const active = logs.filter(l => l.date === todayStr && !l.departureTime)
-                           .sort((a, b) => b.time.localeCompare(a.time));
+    window.updateInv = async (isAdd) => {
+        const name = document.getElementById('invItemName').value.trim();
+        const qtyInput = document.getElementById('invQty');
+        const qty = parseInt(qtyInput.value);
+        if (!name || isNaN(qty)) return alert("Bitte Name und Menge eingeben");
 
-        istListDiv.innerHTML = active.length === 0 ? '<div class="empty-msg">Keine LKW im Werk</div>' : '';
+        const existing = localInventory.find(i => i.name === name);
+        const newQty = existing ? (isAdd ? existing.qty + qty : Math.max(0, existing.qty - qty)) : (isAdd ? qty : 0);
 
-        active.forEach(truck => {
-            const card = document.createElement('div');
-            card.className = 'truck-card ist-card';
-            const typeLabel = truck.type === 'Anlieferung' ? '<span class="badge-in">IN</span>' : '<span class="badge-out">OUT</span>';
+        try {
+            if (existing) await updateDoc(doc(db, "inventory_kassel", existing.id), { qty: newQty });
+            else await addDoc(collection(db, "inventory_kassel"), { name: name, qty: newQty });
+            
+            await addDoc(collection(db, "inventory_history"), {
+                time: new Date().toLocaleString('de-DE'),
+                type: isAdd ? 'ZUGANG' : 'ABGANG',
+                item: name,
+                qty: qty
+            });
+            qtyInput.value = '';
+        } catch (e) { console.error(e); }
+    };
 
-            card.innerHTML = `
-                <div class="info">
-                    <span class="spedition">${truck.spedition}</span>
-                    <div class="details">
-                        <span class="time-badge">${truck.time}</span> | ${typeLabel} | <b>${truck.plate || '?'}</b>
-                    </div>
-                </div>
-                <button class="btn btn-checkout" onclick="mobileCheckout('${truck.id}', '${truck.time}', '${truck.spedition}')">Abmelden</button>
-            `;
-            istListDiv.appendChild(card);
+    // NEU: Klick-Funktion zum Auswählen von Artikeln
+    window.selectInvItem = (name) => {
+        document.getElementById('invItemName').value = name;
+        document.getElementById('invQty').focus();
+    };
+
+    window.renderInventory = () => {
+        const tbody = document.getElementById('invTableBody');
+        const filter = document.getElementById('invSearch').value.toLowerCase();
+        tbody.innerHTML = '';
+        localInventory.forEach(item => {
+            if (item.name.toLowerCase().includes(filter)) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td onclick="window.selectInvItem('${item.name}')"><strong>${item.name}</strong></td>
+                    <td onclick="window.selectInvItem('${item.name}')"><span class="badge in">${item.qty}</span></td>
+                    <td><button onclick="window.deleteInvItem('${item.id}')" class="btn btn-danger btn-small">X</button></td>
+                `;
+                tbody.appendChild(tr);
+            }
         });
+    };
+
+    window.deleteInvItem = async (id) => {
+        if(confirm("Artikel aus Liste löschen?")) await deleteDoc(doc(db, "inventory_kassel", id));
+    };
+
+    // --- RESTLICHE LOGIK ---
+
+    const createTruckIcon = () => {
+        const c = document.createElement('canvas');
+        c.width = 30; c.height = 30;
+        const x = c.getContext('2d');
+        x.font = '24px serif';
+        x.textAlign = 'center'; 
+        x.textBaseline = 'middle'; 
+        x.fillText('🚚', 15, 16);
+        const img = new Image();
+        img.src = c.toDataURL();
+        return img;
+    };
+    const truckIconImg = createTruckIcon();
+
+    window.switchTab = (btn, targetId) => {
+        const parent = btn.closest('.card');
+        parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(targetId).classList.add('active');
+    };
+
+    window.switchSbTab = (btn, targetId) => {
+        const header = btn.parentNode;
+        header.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.sb-container').forEach(c => c.classList.remove('active'));
+        document.getElementById(targetId).classList.add('active');
     }
 
-    function renderPlanList(plans) {
-        const todayStr = new Date().toISOString().split('T')[0];
-        const todayPlans = plans.filter(p => p.date === todayStr)
-                                .sort((a, b) => a.time.localeCompare(b.time));
+    window.toggleInfo = () => {
+        const win = document.getElementById('info-window');
+        win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
+    };
 
-        planListDiv.innerHTML = todayPlans.length === 0 ? '<div class="empty-msg">Keine Planungen für heute</div>' : '';
+    window.fillInput = (fieldId, value) => {
+        document.getElementById(fieldId).value = value;
+        if(fieldId === 'logSpedition') {
+            document.getElementById('logPlate').focus();
+        }
+    };
 
-        todayPlans.forEach(plan => {
-            const card = document.createElement('div');
-            card.className = 'truck-card plan-card';
-            const typeLabel = plan.type === 'Anlieferung' ? '<span class="badge-in">IN</span>' : '<span class="badge-out">OUT</span>';
+    window.fillRegular = (name, target) => {
+        document.getElementById('regName').value = name;
+        document.getElementById('regTarget').value = target;
+    };
 
-            card.innerHTML = `
-                <div class="info">
-                    <span class="spedition">${plan.spedition}</span>
-                    <div class="details">
-                        Plan: <span class="time-badge">${plan.time}</span> | ${typeLabel}
-                    </div>
-                </div>
-                <button class="btn btn-checkin" onclick="mobileCheckin('${plan.id}')">Ankunft</button>
-            `;
-            planListDiv.appendChild(card);
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('headerClock').textContent = now.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+    }, 1000);
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        const beforeYesterday = new Date(today); beforeYesterday.setDate(beforeYesterday.getDate() - 2);
+        const beforeYesterdayStr = beforeYesterday.toISOString().split('T')[0];
+
+        shiftDates = [todayStr, yesterdayStr, beforeYesterdayStr];
+
+        document.getElementById('planDate').value = todayStr;
+        document.getElementById('dateRegToday').textContent = today.toLocaleDateString('de-DE');
+        document.getElementById('dateRegYesterday').textContent = yesterday.toLocaleDateString('de-DE');
+        
+        document.getElementById('sbDate0').textContent = today.toLocaleDateString('de-DE').slice(0,5);
+        document.getElementById('sbDate1').textContent = yesterday.toLocaleDateString('de-DE').slice(0,5);
+        document.getElementById('sbDate2').textContent = beforeYesterday.toLocaleDateString('de-DE').slice(0,5);
+
+        initTimeSelects();
+        initChart();
+        setNow('logTime');
+
+        const qLog = collection(db, "logs");
+        onSnapshot(qLog, (snapshot) => {
+            showLoading();
+            localLog = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderAll();
+            hideLoading();
         });
-    }
 
-    window.mobileCheckout = async (id, startTime, spedition) => {
+        const qPlan = collection(db, "plans");
+        onSnapshot(qPlan, (snapshot) => {
+            showLoading();
+            localPlan = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderAll();
+            hideLoading();
+        });
+
+        const qReg = collection(db, "regular");
+        onSnapshot(qReg, (snapshot) => {
+            localRegular = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderRegularTables(todayStr, yesterdayStr);
+        });
+
+        shiftDates.forEach((dateStr, index) => {
+            onSnapshot(doc(db, "shiftNotes", dateStr), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const elEarly = document.getElementById(`sb-early-${index}`);
+                    const elLate = document.getElementById(`sb-late-${index}`);
+                    if(document.activeElement !== elEarly) elEarly.value = data.early || "";
+                    if(document.activeElement !== elLate) elLate.value = data.late || "";
+                }
+            });
+        });
+
+        onSnapshot(doc(db, "shiftNotes", "global"), (docSnap) => {
+            if (docSnap.exists()) {
+                const el = document.getElementById('global-info-text');
+                if(document.activeElement !== el) {
+                    el.value = docSnap.data().text || "";
+                }
+            }
+        });
+
+        setInterval(renderAll, 60000); 
+    });
+
+    let globalInfoTimeout;
+    window.saveGlobalInfo = () => {
+        clearTimeout(globalInfoTimeout);
+        globalInfoTimeout = setTimeout(async () => {
+            const text = document.getElementById('global-info-text').value;
+            try {
+                await setDoc(doc(db, "shiftNotes", "global"), { text: text }, { merge: true });
+            } catch(e) { console.error(e); }
+        }, 800); 
+    };
+
+    let shiftTimeout;
+    window.saveShift = (dayIndex, type) => { 
+        clearTimeout(shiftTimeout);
+        shiftTimeout = setTimeout(async () => {
+            const dateStr = shiftDates[dayIndex];
+            const elEarly = document.getElementById(`sb-early-${dayIndex}`);
+            const elLate = document.getElementById(`sb-late-${dayIndex}`);
+            try {
+                await setDoc(doc(db, "shiftNotes", dateStr), { 
+                    early: elEarly.value,
+                    late: elLate.value
+                }, { merge: true });
+            } catch(e) { console.error(e); }
+        }, 1000);
+    };
+
+    window.handleLogSubmit = async (e) => {
+        e.preventDefault();
+        const entry = getFormData('log');
+        entry.date = new Date().toISOString().split('T')[0];
+        entry.shift = calculateShift(entry.time);
+        try {
+            await addDoc(collection(db, "logs"), entry);
+            e.target.reset();
+            setNow('logTime');
+        } catch (err) { alert("Fehler: " + err.message); }
+    };
+    document.getElementById('logForm').addEventListener('submit', window.handleLogSubmit);
+
+    window.handlePlanSubmit = async (e) => {
+        e.preventDefault();
+        const entry = getFormData('plan');
+        entry.date = document.getElementById('planDate').value; 
+        try {
+            await addDoc(collection(db, "plans"), entry);
+            e.target.reset();
+            document.getElementById('planDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('planHour').value = "08";
+            document.getElementById('planMinute').value = "00";
+            window.updatePlanTime();
+        } catch (err) { alert("Fehler: " + err.message); }
+    };
+    document.getElementById('planForm').addEventListener('submit', window.handlePlanSubmit);
+
+    document.getElementById('regularForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('regName').value;
+        const target = parseInt(document.getElementById('regTarget').value) || 0;
+        try {
+            await addDoc(collection(db, "regular"), {
+                date: new Date().toISOString().split('T')[0],
+                name: name,
+                target: target,
+                act1: 0, driver1: '', 
+                act2: 0, driver2: '', 
+                act3: 0, driver3: ''
+            });
+            e.target.reset();
+        } catch(err) { console.error(err); }
+    });
+
+    window.addInternalLog = async () => {
+        const now = new Date();
+        const timeStr = now.toTimeString().substring(0,5);
+        const entry = {
+            date: now.toISOString().split('T')[0],
+            time: timeStr,
+            shift: calculateShift(timeStr),
+            type: 'Intern',
+            spedition: 'Eigener Fuhrpark',
+            plate: 'H-LH',
+            ware: 'Werkstransport', 
+            departureTime: null, duration: null
+        };
+        try { await addDoc(collection(db, "logs"), entry); } catch(e) { console.error(e); }
+    };
+
+    window.addNextTour = async (id) => {
+        const item = localRegular.find(r => r.id === id);
+        if(!item) return;
+        let nextIndex = 1;
+        for(let i=1; i<20; i++) { if(item['act'+i] !== undefined) nextIndex = i + 1; }
+        if(nextIndex < 4) nextIndex = 4;
+        const updateObj = {};
+        updateObj['act' + nextIndex] = 0;
+        updateObj['driver' + nextIndex] = '';
+        try { await updateDoc(doc(db, "regular", id), updateObj); } catch(e) { console.error(e); }
+    };
+
+    window.removeTour = async (id, index) => {
+        if(confirm("Diese Zusatz-Tour entfernen?")) {
+            try {
+                const updateObj = {};
+                updateObj['act' + index] = deleteField();
+                updateObj['driver' + index] = deleteField();
+                await updateDoc(doc(db, "regular", id), updateObj);
+            } catch(e) { console.error(e); }
+        }
+    };
+
+    window.loadStandardRoutes = async () => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const standardList = [
+            { name: 'RT Q7 FBA Links VW-Hujer', target: 1232 },
+            { name: 'RT Q7 FBA Rechts VW-Hujer', target: 1232 },
+            { name: 'RT MEB (Grüner) VW - M32', target: 896 },
+            { name: 'RT PPE VW - HH', target: 1260 },
+            { name: 'RT Q7 FBA Links Hujer-HH', target: 900 },
+            { name: 'RT Q7 FBA Rechts Hujer-HH', target: 900 },
+            { name: 'RT T7 FBA Links VW-Hujer', target: 576 },
+            { name: 'RT T7 FBA Rechts VW-Hujer', target: 512 },
+            { name: 'RT T7 FBA Links Hujer-HH', target: 420 },
+            { name: 'RT T7 FBA Rechts Hujer-HH', target: 420 }
+        ];
+        let addedCount = 0;
+        for (const item of standardList) {
+            const exists = localRegular.some(r => r.date === todayStr && r.name === item.name);
+            if (!exists) {
+                try {
+                    await addDoc(collection(db, "regular"), {
+                        date: todayStr, name: item.name, target: item.target,
+                        act1: 0, driver1: '', act2: 0, driver2: '', act3: 0, driver3: ''
+                    });
+                    addedCount++;
+                } catch(e) { console.error(e); }
+            }
+        }
+        if(addedCount > 0) alert(`${addedCount} Standard-Touren angelegt!`);
+        else alert("Touren für heute waren bereits vollständig.");
+    };
+
+    window.updatePlanPlate = async (id, newPlate) => {
+        try { if(id) await updateDoc(doc(db, "plans", id), { plate: newPlate }); } 
+        catch (err) { console.error(err); }
+    };
+
+    window.updateLogWare = async (id, newWare) => {
+        try { if(id) await updateDoc(doc(db, "logs", id), { ware: newWare }); }
+        catch (err) { console.error("Fehler Update Ware:", err); }
+    };
+
+    window.updateRegular = async (id, field, value) => {
+        try {
+            const updateObj = {};
+            if(field.startsWith('driver')) updateObj[field] = value;
+            else updateObj[field] = parseInt(value) || 0;
+            await updateDoc(doc(db, "regular", id), updateObj);
+        } catch(err) { console.error(err); }
+    };
+
+    window.handleRegEnter = (e, rowId, index) => {
+        if(e.key === 'Enter') { document.getElementById(`driver_${rowId}_${index}`).focus(); }
+    };
+
+    window.getDriverSelect = (id, fieldName, currentValue, index) => {
+        const drivers = ['Süss', 'Soldan', 'Mohammad', 'Demirci', 'Erol', 'Siebert', 'Mörs', 'Kellner', 'Fremd'];
+        let opts = `<option value="">Fahrer?</option>`;
+        drivers.forEach(d => {
+            const sel = (currentValue === d) ? 'selected' : '';
+            opts += `<option value="${d}" ${sel}>${d}</option>`;
+        });
+        return `<select id="driver_${id}_${index}" class="driver-select-small" onchange="window.updateRegular('${id}', '${fieldName}', this.value)">${opts}</select>`;
+    };
+
+    window.deleteLog = async (id) => { if(confirm("Eintrag löschen?")) await deleteDoc(doc(db, "logs", id)); };
+    window.deletePlan = async (id) => { if(confirm("Planung löschen?")) await deleteDoc(doc(db, "plans", id)); };
+    window.deleteRegular = async (id) => { if(confirm("Diesen Regeltransport löschen?")) await deleteDoc(doc(db, "regular", id)); };
+
+    window.setDeparture = async (id) => {
+        const item = localLog.find(x => x.id === id);
+        if(!item) return;
         const nowTime = new Date().toTimeString().substring(0,5);
-        const userTime = prompt(`Abfahrt für ${spedition}:\nWann ist er gefahren?`, nowTime);
-        if (!userTime) return;
-
-        const duration = calculateDuration(startTime, userTime);
+        const userTime = prompt(`Check-out für ${item.spedition} (${item.plate}):\nUhrzeit bestätigen:`, nowTime);
+        if (userTime === null || userTime === "") return;
+        const duration = calculateDuration(item.time, userTime);
         try {
             await updateDoc(doc(db, "logs", id), { departureTime: userTime, duration: duration });
-        } catch (e) { alert("Fehler!"); }
+        } catch(e) { console.error("Fehler beim Speichern:", e); }
     };
 
-    window.mobileCheckin = async (id) => {
-        if(!confirm("LKW jetzt als 'Ist da' erfassen?")) return;
-        
-        onSnapshot(doc(db, "plans", id), async (docSnap) => {
-            if (!docSnap.exists()) return;
-            const p = docSnap.data();
-            const now = new Date();
-            const curTime = now.toTimeString().substring(0,5);
-            
-            const logEntry = {
-                spedition: p.spedition, plate: p.plate || '?', ware: p.ware,
-                type: p.type, date: now.toISOString().split('T')[0],
-                time: curTime, shift: calculateShift(curTime),
-                departureTime: null, duration: null, fromPlanId: id
-            };
-
-            try {
-                await addDoc(collection(db, "logs"), logEntry);
-                await deleteDoc(doc(db, "plans", id));
-            } catch (e) { console.error(e); }
-        }, { once: true });
+    window.createReturn = async (id) => {
+        const original = localLog.find(x => x.id === id);
+        if(!original) return;
+        const newType = original.type === 'Anlieferung' ? 'Abholung' : 'Anlieferung';
+        const now = new Date();
+        const curTime = now.toTimeString().substring(0,5);
+        const newEntry = {
+            spedition: original.spedition, plate: original.plate, ware: '', 
+            type: newType, date: now.toISOString().split('T')[0],
+            time: curTime, shift: calculateShift(curTime), departureTime: null, duration: null
+        };
+        await addDoc(collection(db, "logs"), newEntry);
     };
 
-    function calculateDuration(start, end) {
-        const [h1, m1] = start.split(':').map(Number), [h2, m2] = end.split(':').map(Number);
-        let diff = (h2*60+m2) - (h1*60+m1);
-        if(diff < 0) diff += 1440;
-        const h = Math.floor(diff/60), m = diff%60;
-        return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    window.checkIn = async (id) => {
+        const planItem = localPlan.find(x => x.id === id);
+        if (!planItem) return;
+        const now = new Date();
+        const logEntry = {
+            spedition: planItem.spedition, plate: planItem.plate || '?', ware: planItem.ware,
+            type: planItem.type, date: now.toISOString().split('T')[0],
+            time: now.toTimeString().substring(0,5), shift: calculateShift(now.toTimeString().substring(0,5)),
+            departureTime: null, duration: null, fromPlanId: id
+        };
+        await addDoc(collection(db, "logs"), logEntry);
+        await deleteDoc(doc(db, "plans", id));
+    };
+
+    window.renderAll = () => {
+        window.renderLogTable();
+        renderPlanTables();
+        calculateStats();
+        updateChart();
+    };
+
+    function renderRegularTables(todayStr, yesterdayStr) {
+        const tbodyToday = document.querySelector('#regTableToday tbody');
+        const tbodyYesterday = document.querySelector('#regTableYesterday tbody');
+        tbodyToday.innerHTML = ''; tbodyYesterday.innerHTML = '';
+        const orderMap = {
+            'RT Q7 FBA Links VW-Hujer': 1, 'RT Q7 FBA Rechts VW-Hujer': 2, 'RT Q7 FBA Links Hujer-HH': 3,
+            'RT Q7 FBA Rechts Hujer-HH': 4, 'RT T7 FBA Links VW-Hujer': 5, 'RT T7 FBA Rechts VW-Hujer': 6,
+            'RT T7 FBA Links Hujer-HH': 7, 'RT T7 FBA Rechts Hujer-HH': 8, 'RT MEB (Grüner) VW - M32': 9, 'RT PPE VW - HH': 10
+        };
+        const sorted = [...localRegular].sort((a,b) => {
+            const rankA = orderMap[a.name] || 99; const rankB = orderMap[b.name] || 99;
+            if (rankA !== rankB) return rankA - rankB; return a.name.localeCompare(b.name);
+        });
+        sorted.forEach(item => {
+            let sum = 0, maxIndex = 3; 
+            for(const key in item) { if(key.startsWith('act')) { sum += (item[key] || 0); const idx = parseInt(key.replace('act', '')); if(idx > maxIndex) maxIndex = idx; } }
+            const rest = (item.target || 0) - sum;
+            const percentage = Math.min(100, Math.round((sum / (item.target || 1)) * 100));
+            let barClass = 'bg-red'; if(percentage > 50) barClass = 'bg-orange'; if(percentage >= 100) barClass = 'bg-green';
+            const progressBar = `<div class="progress-wrapper"><div class="progress-fill ${barClass}" style="width: ${percentage}%">${sum}/${item.target}</div></div>`;
+            let rowClass = ""; if (item.name.includes("VW-Hujer")) rowClass = "row-vw-hujer"; else if (item.name.includes("Hujer-HH")) rowClass = "row-hujer-hh";
+            if(item.date === todayStr) {
+                let fixedCols = '';
+                for(let i=1; i<=3; i++) {
+                    fixedCols += `<td><div class="tour-cell">
+                        <input type="number" class="table-input table-num" value="${item['act'+i]||''}" onchange="window.updateRegular('${item.id}', 'act${i}', this.value)" onkeyup="window.handleRegEnter(event, '${item.id}', ${i})">
+                        ${window.getDriverSelect(item.id, 'driver'+i, item['driver'+i], i)}</div></td>`;
+                }
+                let extrasHtml = '<div class="extra-wrapper">';
+                for(let i=4; i<=maxIndex; i++) {
+                    if(item['act'+i] !== undefined) {
+                        extrasHtml += `<div class="extra-box">
+                        <input type="number" class="table-input table-num" value="${item['act'+i]||''}" onchange="window.updateRegular('${item.id}', 'act${i}', this.value)" onkeyup="window.handleRegEnter(event, '${item.id}', ${i})">
+                        ${window.getDriverSelect(item.id, 'driver'+i, item['driver'+i], i)}
+                        <div onclick="window.removeTour('${item.id}', ${i})" class="btn-remove-tour" title="Entfernen">×</div></div>`;
+                    }
+                }
+                if(item.act1 > 0 && item.act2 > 0 && item.act3 > 0) { extrasHtml += `<button onclick="window.addNextTour('${item.id}')" class="btn btn-add" title="Zusatz-Tour" style="width:30px;">+</button>`; }
+                extrasHtml += '</div>';
+                const tr = document.createElement('tr'); if(rowClass) tr.className = rowClass; 
+                tr.innerHTML = `<td><strong>${item.name}</strong></td><td>${item.target}</td>${fixedCols}<td>${extrasHtml}</td><td>${progressBar}</td><td><button onclick="window.deleteRegular('${item.id}')" class="btn btn-danger btn-small">X</button></td>`;
+                tbodyToday.appendChild(tr);
+            } else if (item.date === yesterdayStr) {
+                let t1 = `${item.act1||0} (${item.driver1||'-'})`, t2 = `${item.act2||0} (${item.driver2||'-'})`, t3 = `${item.act3||0} (${item.driver3||'-'})`;
+                let extras = []; for(let i=4; i<=maxIndex; i++) { if(item['act'+i]) extras.push(`${item['act'+i]} (${item['driver'+i]||'-'})`); }
+                const tr = document.createElement('tr'); if(rowClass) tr.className = rowClass; 
+                tr.innerHTML = `<td>${item.name}</td><td>${item.target}</td><td>${t1}</td><td>${t2}</td><td>${t3}</td><td>${extras.join(', ')}</td><td style="font-weight:bold; color:${rest<=0?'green':'red'}">${rest}</td>`;
+                tbodyYesterday.appendChild(tr);
+            }
+        });
     }
 
-    function calculateShift(timeStr) {
-        const h = parseInt(timeStr.split(':')[0]);
-        if(h>=6 && h<14) return "Früh";
-        if(h>=14 && h<22) return "Spät";
-        return "Nacht";
+    window.renderLogTable = () => {
+        const tbody = document.querySelector('#logTable tbody'); tbody.innerHTML = '';
+        const todayStr = new Date().toISOString().split('T')[0];
+        const searchText = document.getElementById('searchInput').value.toLowerCase(); 
+        const sorted = [...localLog].sort((a, b) => {
+            const aDone = !!a.departureTime; const bDone = !!b.departureTime;
+            if (aDone !== bDone) return aDone ? 1 : -1; return b.time.localeCompare(a.time);
+        });
+        sorted.forEach(entry => {
+            if(entry.date !== todayStr) return;
+            const searchString = `${entry.spedition} ${entry.plate} ${entry.ware} ${entry.type}`.toLowerCase();
+            if(searchText && !searchString.includes(searchText)) return; 
+            const badge = entry.type === 'Intern' ? 'intern' : (entry.type === 'Anlieferung' ? 'in' : 'out');
+            const tr = document.createElement('tr');
+            let statusContent = '';
+            if (entry.departureTime) { tr.className = 'row-finished'; statusContent = `✅ <span style="font-size:0.9em">${entry.duration}</span>`; }
+            else { statusContent = `<button onclick="window.createReturn('${entry.id}')" class="btn btn-info btn-icon" title="Gegenlauf erzeugen">🔄</button><button onclick="window.setDeparture('${entry.id}')" class="btn btn-done btn-icon" title="Fertig">✅</button>`; }
+            const wareInput = `<input type="text" class="table-input" value="${entry.ware||''}" placeholder="..." onchange="window.updateLogWare('${entry.id}', this.value)">`;
+            tr.innerHTML = `<td><strong>${entry.time}</strong></td><td><span class="badge ${badge}">${entry.type}</span></td><td>${entry.spedition}</td><td>${entry.plate}</td><td>${wareInput}</td><td>${statusContent}</td><td><button onclick="window.deleteLog('${entry.id}')" class="btn btn-danger btn-small">X</button></td>`;
+            tbody.appendChild(tr);
+        });
+    };
+
+    function renderPlanTables() {
+        const tbodyToday = document.querySelector('#planTableToday tbody'); const tbodyFuture = document.querySelector('#planTableFuture tbody');
+        tbodyToday.innerHTML = ''; tbodyFuture.innerHTML = '';
+        const todayStr = new Date().toISOString().split('T')[0];
+        const curMin = new Date().getHours() * 60 + new Date().getMinutes();
+        const sorted = [...localPlan].sort((a,b) => (a.date === b.date) ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date));
+        let cT=0;
+        sorted.forEach(e => {
+            const badge = e.type === 'Anlieferung' ? 'in' : 'out';
+            const plateInput = `<input type="text" class="table-input" value="${e.plate || ''}" placeholder="?" onchange="window.updatePlanPlate('${e.id}', this.value)">`;
+            if(e.date === todayStr) {
+                cT++; const [h, m] = e.time.split(':').map(Number);
+                const isLate = curMin > (h*60+m + 15);
+                const tr = document.createElement('tr'); if(isLate) tr.className = 'row-overdue';
+                tr.innerHTML = `<td><strong>${e.time}</strong></td><td>${isLate?'<span style="color:#ef4444; font-weight:bold;">⚠️ Überfällig</span>':'Geplant'}</td><td><span class="badge ${badge}">${e.type}</span></td><td>${e.spedition}</td><td>${plateInput}</td><td>${e.ware || '-'}</td><td><button onclick="window.checkIn('${e.id}')" class="btn btn-success btn-small">Ist da</button> <button onclick="window.deletePlan('${e.id}')" class="btn btn-danger btn-small">X</button></td>`;
+                tbodyToday.appendChild(tr);
+            } else if (e.date > todayStr) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${new Date(e.date).toLocaleDateString()}</td><td><span class="badge ${badge}">${e.type}</span></td><td>${e.spedition}</td><td>${plateInput}</td><td>${e.ware || '-'}</td><td><button onclick="window.deletePlan('${e.id}')" class="btn btn-danger btn-small">X</button></td>`;
+                tbodyFuture.appendChild(tr);
+            }
+        });
+        document.getElementById('noTodayMsg').style.display = cT===0?'block':'none';
+    }
+
+    function getFormData(prefix) { return { time: document.getElementById(prefix + 'Time').value, spedition: document.getElementById(prefix + 'Spedition').value, plate: document.getElementById(prefix + 'Plate').value || '', ware: document.getElementById(prefix + 'Ware').value, type: document.getElementById(prefix + 'Type').value }; }
+    function calculateShift(timeStr) { const h = parseInt(timeStr.split(':')[0]); if(h>=6 && h<14) return "Früh"; if(h>=14 && h<22) return "Spät"; return "Nacht"; }
+    function calculateDuration(start, end) { const [h1, m1] = start.split(':').map(Number), [h2, m2] = end.split(':').map(Number); let diff = (h2*60+m2) - (h1*60+m1); if(diff<0) diff+=1440; const h=Math.floor(diff/60), m=diff%60; return h>0 ? `${h}h ${m}m` : `${m}m`; }
+    function setNow(id) { document.getElementById(id).value = new Date().toTimeString().substring(0,5); }
+    
+    function initTimeSelects() {
+        const hourSelect = document.getElementById('planHour');
+        for(let i=0; i<24; i++) {
+            const val = i.toString().padStart(2, '0'); const opt = document.createElement('option');
+            opt.value = val; opt.text = val + ' Uhr'; if(i === 8) opt.selected = true; hourSelect.appendChild(opt);
+        }
+        window.updatePlanTime();
+    }
+    window.updatePlanTime = () => { const h = document.getElementById('planHour').value, m = document.getElementById('planMinute').value; document.getElementById('planTime').value = `${h}:${m}`; }
+
+    window.exportToCSV = () => {
+        let csv = "Datum;Ankunft;Abfahrt;Dauer;Spedition;Kennzeichen;Ware;Typ\n";
+        localLog.forEach(r => csv += `${r.date};${r.time};${r.departureTime||'-'};${r.duration||'-'};${r.spedition};${r.plate};${r.ware};${r.type}\n`);
+        const link = document.createElement("a"); link.href = "data:text/csv;charset=utf-8," + encodeURI(csv); link.download = `LKW_Export_${new Date().toLocaleDateString()}.csv`; link.click();
+    }
+
+    function showLoading() { document.getElementById('loading-indicator').style.display = 'block'; }
+    function hideLoading() { document.getElementById('loading-indicator').style.display = 'none'; }
+
+    function initChart() {
+        const ctx = document.getElementById('frequencyChart'); if(!ctx) return;
+        myChart = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: { labels: [], datasets: [
+                { label: 'LKW (Ist)', data: [], borderColor: '#c40d1e', backgroundColor: 'rgba(196, 13, 30, 0.1)', borderWidth: 3, fill: true, tension: 0.4 },
+                { label: 'LKW (Geplant)', data: [], pointStyle: truckIconImg, pointRadius: 15, borderColor: '#9ca3af', borderWidth: 2, borderDash: [5, 5], fill: false, showLine: true }
+            ]},
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: {beginAtZero:true, ticks:{stepSize:1}}, x: {grid:{display:false}} }, plugins:{ legend:{display:false}, tooltip: { usePointStyle: true } } }
+        });
+    }
+    
+    function updateChart() {
+        if(!myChart) return;
+        const hours=[], dataActual=[], dataPlan=[]; const todayStr=new Date().toISOString().split('T')[0];
+        for(let i=5; i<=22; i++) hours.push(i.toString().padStart(2,'0')+' Uhr');
+        const countsActual={}, countsPlan={};
+        localLog.forEach(e => { if(e.date===todayStr) { const h=parseInt(e.time.split(':')[0]); countsActual[h]=(countsActual[h]||0)+1; } });
+        localPlan.forEach(e => { if(e.date === todayStr) { const h=parseInt(e.time.split(':')[0]); countsPlan[h]=(countsPlan[h]||0)+1; } });
+        for(let i=5; i<=22; i++) { dataActual.push(countsActual[i]||0); const pVal = countsPlan[i]||0; dataPlan.push(pVal > 0 ? pVal : null); }
+        myChart.data.labels = hours; myChart.data.datasets[0].data = dataActual; myChart.data.datasets[1].data = dataPlan; myChart.update();
+    }
+
+    function calculateStats() {
+        let early=0, late=0, hours={}; const todayStr=new Date().toISOString().split('T')[0];
+        localLog.forEach(e => { if(e.date===todayStr) { if(e.shift==='Früh') early++; if(e.shift==='Spät') late++; const h=parseInt(e.time.split(':')[0]); hours[h]=(hours[h]||0)+1; } });
+        let max=0, peak='-'; for(let [h,c] of Object.entries(hours)) { if(c>max){max=c; peak=`${h}-${parseInt(h)+1} Uhr`;} }
+        document.getElementById('stat-early').textContent=early; document.getElementById('stat-late').textContent=late; document.getElementById('stat-peak').textContent=peak;
     }
 </script>
-
 </body>
 </html>

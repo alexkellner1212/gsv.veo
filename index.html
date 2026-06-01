@@ -3,312 +3,352 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tombola Tracker – E-Jugend 31. Mai</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Startgeld-Quittungen · Turnier 2025</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{
-  --gr:#22c55e;--grl:#bbf7d0;--grd:#15803d;
-  --ye:#fbbf24;--yel:#fef9c3;
-  --re:#ef4444;--rel:#fee2e2;
-  --bl:#3b82f6;
-  --bg:#f0fdf4;--ca:#fff;--tx:#1a2e1a;--mu:#6b7280;--bo:#d1fae5;
-  --ra:16px;--sh:0 4px 20px rgba(34,197,94,.10);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:60px}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f4f6f9; min-height: 100vh; color: #1a1a1a; }
 
-header{background:linear-gradient(135deg,#15803d,#22c55e 60%,#fbbf24);padding:28px 20px 24px;text-align:center;position:relative;overflow:hidden}
-header::before{content:"⚽";position:absolute;font-size:110px;opacity:.07;top:-15px;right:-10px}
-header::after{content:"🎟️";position:absolute;font-size:90px;opacity:.07;bottom:-15px;left:-8px}
-header h1{font-family:'Fredoka One',cursive;font-size:clamp(24px,5vw,40px);color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.15)}
-header p{color:#dcfce7;font-size:14px;margin-top:5px;font-weight:600}
-.badge{display:inline-block;background:var(--ye);color:#78350f;font-size:12px;font-weight:800;border-radius:20px;padding:3px 14px;margin-top:8px}
+.topbar { background: #1a3a6b; color: white; padding: 12px 24px; display: flex; align-items: center; gap: 12px; }
+.topbar-logo { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.topbar-sub { font-size: 12px; opacity: 0.6; margin-left: auto; }
 
-.syncbar{background:var(--ca);border-bottom:2px solid var(--bo);padding:8px 16px;font-size:12px;font-weight:700;color:var(--mu);display:flex;align-items:center;justify-content:center;gap:8px}
-.dot{width:8px;height:8px;border-radius:50%;background:#d1d5db;display:inline-block;flex-shrink:0;transition:background .3s}
-.dot.on{background:var(--gr);animation:pulse 2s infinite}
-.dot.err{background:var(--re)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.container { max-width: 720px; margin: 0 auto; padding: 2rem 1rem 4rem; }
 
-.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:16px 14px 0;max-width:720px;margin:0 auto}
-.sc{background:var(--ca);border-radius:12px;padding:10px 16px;text-align:center;box-shadow:var(--sh);flex:1;min-width:75px;border:2px solid var(--bo)}
-.sc .n{font-family:'Fredoka One',cursive;font-size:26px;line-height:1}
-.sc .l{font-size:10px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
-.sc.g .n{color:var(--grd)}.sc.y .n{color:#b45309}.sc.b .n{color:var(--bl)}.sc.r .n{color:var(--re)}
+.hero { background: white; border-radius: 12px; border: 1px solid #e8eaed; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 16px; }
+.hero-icon { width: 48px; height: 48px; background: #e8f0fe; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hero-icon svg { width: 24px; height: 24px; color: #1a3a6b; }
+.hero h1 { font-size: 18px; font-weight: 600; }
+.hero p { font-size: 13px; color: #666; margin-top: 3px; }
+.pp-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; background: #f0f7ff; color: #003087; border: 1px solid #c8dff7; border-radius: 6px; padding: 3px 10px; margin-top: 6px; font-weight: 500; }
 
-.wrap{max-width:720px;margin:0 auto;padding:18px 14px}
-.box{background:var(--ca);border-radius:var(--ra);padding:20px;margin-bottom:20px;box-shadow:var(--sh);border:2px solid var(--bo)}
-.box h2{font-family:'Fredoka One',cursive;font-size:19px;color:var(--grd);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.controls { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+.controls input { flex: 1; padding: 9px 12px; border: 1px solid #dde1e7; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.15s; }
+.controls input:focus { border-color: #1a3a6b; }
+.controls select { padding: 9px 12px; border: 1px solid #dde1e7; border-radius: 8px; font-size: 14px; outline: none; background: white; cursor: pointer; }
+.controls select:focus { border-color: #1a3a6b; }
 
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.fg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px}
-label{font-size:11px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
-input,textarea{font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;border:2px solid #e5e7eb;border-radius:10px;padding:8px 11px;outline:none;transition:border .2s;background:#fafafa;color:var(--tx);width:100%}
-input:focus,textarea:focus{border-color:var(--gr);background:#fff}
-textarea{resize:vertical;min-height:52px}
+.group-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #999; margin: 1.25rem 0 0.5rem; }
 
-.btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;border:none;border-radius:10px;padding:9px 18px;cursor:pointer;transition:transform .1s}
-.btn:active{transform:scale(.97)}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-.bg{background:linear-gradient(135deg,var(--grd),var(--gr));color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}
-.br{background:var(--re);color:#fff}
-.bo{background:transparent;border:2px solid #e5e7eb;color:var(--mu)}
-.bo:hover{border-color:var(--re);color:var(--re)}
-.bs{font-size:11px;padding:5px 11px}
+.team-card { background: white; border: 1px solid #e8eaed; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 6px; transition: border-color 0.15s, box-shadow 0.15s; }
+.team-card:hover { border-color: #b8c7e0; box-shadow: 0 2px 8px rgba(26,58,107,0.06); }
 
-.eh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
-.eh h2{font-family:'Fredoka One',cursive;font-size:19px;color:var(--tx);display:flex;align-items:center;gap:6px}
-.tabs{display:flex;gap:4px;flex-wrap:wrap}
-.tab{font-size:11px;font-weight:800;padding:4px 11px;border-radius:20px;border:2px solid #e5e7eb;cursor:pointer;background:#fff;color:var(--mu);transition:all .15s}
-.tab.act{background:var(--gr);color:#fff;border-color:var(--gr)}
-.tab.act-r{background:var(--re);color:#fff;border-color:var(--re)}
+.group-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.dot-a { background: #dbeafe; color: #1e40af; }
+.dot-b { background: #dcfce7; color: #166534; }
+.dot-c { background: #fef3c7; color: #92400e; }
+.dot-d { background: #fce7f3; color: #9d174d; }
 
-.elist{display:flex;flex-direction:column;gap:11px}
-.ec{background:var(--ca);border-radius:var(--ra);padding:14px 16px;box-shadow:var(--sh);border:2px solid var(--bo);transition:transform .15s;animation:si .3s ease}
-.ec:hover{transform:translateY(-2px)}
-@keyframes si{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.ec.confirmed{border-color:var(--gr);background:linear-gradient(135deg,#f0fdf4,#fff)}
-.ec.pending{border-color:#fde68a;background:linear-gradient(135deg,#fffbeb,#fff)}
-.ec.declined{border-color:#fca5a5;background:linear-gradient(135deg,#fff5f5,#fff)}
+.team-info { flex: 1; }
+.team-name { font-size: 14px; font-weight: 500; }
+.team-meta { font-size: 12px; color: #888; margin-top: 2px; }
 
-.etop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px}
-.ename{font-size:15px;font-weight:800;display:flex;align-items:center;gap:5px}
-.pill{font-size:10px;font-weight:800;padding:2px 9px;border-radius:20px;white-space:nowrap}
-.pill.pending{background:var(--yel);color:#92400e}
-.pill.confirmed{background:var(--grl);color:var(--grd)}
-.pill.declined{background:var(--rel);color:#991b1b}
-.etarget{font-size:12px;color:var(--mu);font-weight:700;margin-bottom:4px}
-.enote{font-size:12px;color:#374151;margin-bottom:6px;background:#f9fafb;border-radius:7px;padding:5px 9px;border-left:3px solid var(--bo)}
-.edonation{font-size:12px;font-weight:700;color:var(--grd);background:var(--grl);border-radius:7px;padding:4px 10px;display:inline-block;margin-bottom:6px}
-.edeclined{font-size:12px;font-weight:700;color:#991b1b;background:var(--rel);border-radius:7px;padding:4px 10px;display:inline-block;margin-bottom:6px}
-.eactions{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
-.dchip{font-size:10px;color:var(--mu);font-weight:600}
+.amount { font-size: 14px; font-weight: 600; color: #1a3a6b; margin-right: 8px; }
 
-.cform{margin-top:10px;padding:11px;border-radius:10px;border:1px dashed;display:none}
-.cform.open{display:block}
-.cform.cf-y{background:#f0fdf4;border-color:var(--gr)}
-.cform.cf-n{background:#fff5f5;border-color:var(--re)}
-.cform input,.cform textarea{margin-bottom:7px}
+.btn-dl { display: flex; align-items: center; gap: 5px; font-size: 12px; padding: 7px 14px; background: #1a3a6b; color: white; border: none; border-radius: 7px; cursor: pointer; font-weight: 500; transition: background 0.12s; white-space: nowrap; }
+.btn-dl:hover { background: #22489e; }
+.btn-dl svg { width: 14px; height: 14px; }
 
-.empty{text-align:center;padding:36px 16px;color:var(--mu);font-size:14px;font-weight:600}
-.empty .ico{font-size:44px;margin-bottom:8px}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--grl);border-top-color:var(--gr);border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes sp{to{transform:rotate(360deg)}}
+.empty { text-align: center; padding: 3rem; color: #999; font-size: 14px; }
 
-footer{text-align:center;padding:18px;color:var(--mu);font-size:12px;font-weight:600}
+/* Modal */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.modal { background: white; border-radius: 14px; width: 440px; max-width: 100%; padding: 1.75rem; box-shadow: 0 20px 60px rgba(0,0,0,0.18); }
+.modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.25rem; }
+.modal-header h2 { font-size: 16px; font-weight: 600; }
+.modal-header p { font-size: 12px; color: #888; margin-top: 2px; }
+.modal-close { background: none; border: none; cursor: pointer; color: #999; font-size: 20px; line-height: 1; padding: 2px; }
+.modal-close:hover { color: #333; }
+
+.pp-header { display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+.pp-wordmark { font-size: 20px; font-weight: 800; color: #003087; }
+.pp-wordmark span { color: #009cde; }
+
+.receipt-rows { border: 1px solid #eee; border-radius: 8px; overflow: hidden; margin-bottom: 1.25rem; }
+.receipt-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+.receipt-row:last-child { border-bottom: none; }
+.receipt-row:nth-child(odd) { background: #fafafa; }
+.receipt-label { color: #777; }
+.receipt-val { font-weight: 500; }
+.receipt-val.green { color: #166534; }
+
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.btn-cancel { padding: 9px 16px; background: transparent; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; font-size: 13px; color: #555; }
+.btn-cancel:hover { background: #f5f5f5; }
+.btn-confirm { padding: 9px 18px; background: #003087; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.btn-confirm:hover { background: #004ab3; }
+.btn-confirm svg { width: 14px; height: 14px; }
+
+.toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #166534; color: white; border-radius: 8px; padding: 10px 16px; font-size: 13px; display: flex; align-items: center; gap: 8px; z-index: 2000; opacity: 0; transform: translateY(8px); transition: opacity 0.25s, transform 0.25s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>🎟️ Tombola Tracker Eintracht Baunatal</h1>
-  <p>E-Jugend Turnier – 31. Mai</p>
-  <div class="badge">⚽ Echtzeit für alle Eltern!</div>
-</header>
-
-<div class="syncbar">
-  <span class="dot" id="dot"></span>
-  <span id="syncMsg">Verbinde...</span>
+<div class="topbar">
+  <div class="topbar-logo">⚽ Turnier 2025 · Eintracht Baunatal</div>
+  <div class="topbar-sub">Startgeld-Portal</div>
 </div>
 
-<div class="stats">
-  <div class="sc b"><div class="n" id="sAll">–</div><div class="l">Gesamt</div></div>
-  <div class="sc y"><div class="n" id="sPend">–</div><div class="l">Offen</div></div>
-  <div class="sc g"><div class="n" id="sConf">–</div><div class="l">Zusagen</div></div>
-  <div class="sc r"><div class="n" id="sDecl">–</div><div class="l">Absagen</div></div>
-</div>
-
-<div class="wrap">
-  <div class="box">
-    <h2>➕ Neue Anfrage eintragen</h2>
-    <div class="row">
-      <div class="fg"><label>Dein Name</label><input id="iName" placeholder="z.B. Familie Müller"></div>
-      <div class="fg"><label>Angefragt bei</label><input id="iTarget" placeholder="z.B. Bäckerei Schulz"></div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">
+      <svg fill="none" stroke="#1a3a6b" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M7 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2M9 4a2 2 0 012-2h2a2 2 0 012 2v0a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
     </div>
-    <div class="row" style="margin-top:9px">
-      <div class="fg"><label>Notiz (optional)</label><textarea id="iNote" placeholder="Was wurde angefragt? Besondere Infos..."></textarea></div>
-    </div>
-    <div style="margin-top:11px;text-align:right">
-      <button class="btn bg" id="btnAdd" onclick="addEntry()">✅ Anfrage speichern</button>
+    <div>
+      <h1>Startgeld-Quittungen herunterladen</h1>
+      <p>Finde deine Mannschaft und lade die offizielle Quittung als PDF herunter.</p>
+      <div class="pp-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#003087" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        Zahlung via PayPal · 30,00 €
+      </div>
     </div>
   </div>
 
-  <div class="eh">
-    <h2>📋 Alle Anfragen</h2>
-    <div class="tabs">
-      <div class="tab act" onclick="setF('all',this)">Alle</div>
-      <div class="tab" onclick="setF('pending',this)">Offen</div>
-      <div class="tab" onclick="setF('confirmed',this)">✅ Zusagen</div>
-      <div class="tab" onclick="setF('declined',this)">❌ Absagen</div>
-    </div>
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍 Mannschaft suchen..." oninput="render()" />
+    <select id="groupFilter" onchange="render()">
+      <option value="">Alle Gruppen</option>
+      <option value="A">Gruppe A</option>
+      <option value="B">Gruppe B</option>
+      <option value="C">Gruppe C</option>
+      <option value="D">Gruppe D</option>
+    </select>
   </div>
 
-  <div class="elist" id="list">
-    <div class="empty"><span class="spin"></span>Verbinde mit Firebase...</div>
+  <div id="list"></div>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="modal" style="display:none" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h2 id="modal-title"></h2>
+        <p>Quittung überprüfen und herunterladen</p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="pp-header">
+      <div class="pp-wordmark">Pay<span>Pal</span></div>
+      <span style="font-size:12px;color:#888;">Zahlungsbestätigung</span>
+    </div>
+    <div class="receipt-rows" id="modal-rows"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
+      <button class="btn-confirm" onclick="generatePDF()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        PDF herunterladen
+      </button>
+    </div>
   </div>
 </div>
 
-<footer>Kontakt: <strong>Markus Joiko</strong> &amp; <strong>Alexander Kellner</strong> &nbsp;|&nbsp; Tombola 31. Mai ⚽</footer>
+<div class="toast" id="toast">✓ <span id="toast-msg"></span></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, update, remove, onValue, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script>
+const teams = [
+  {name:"Eintracht Baunatal I",gruppe:"A",platz:1,sp:5,t:"10:3",td:7,pkt:13},
+  {name:"JSG Bad Emstal",gruppe:"A",platz:2,sp:5,t:"8:5",td:3,pkt:9},
+  {name:"FC Großalmerode",gruppe:"A",platz:3,sp:5,t:"4:5",td:-1,pkt:7},
+  {name:"RSV Göttingen 05",gruppe:"A",platz:4,sp:5,t:"6:6",td:0,pkt:6},
+  {name:"JSG Warmetal",gruppe:"A",platz:5,sp:5,t:"4:7",td:-3,pkt:6},
+  {name:"CSC03 Kassel II",gruppe:"A",platz:6,sp:5,t:"4:10",td:-6,pkt:3},
+  {name:"TV Friedrichstein",gruppe:"B",platz:1,sp:5,t:"10:2",td:8,pkt:13},
+  {name:"JFV West Göttingen",gruppe:"B",platz:2,sp:5,t:"9:3",td:6,pkt:10},
+  {name:"Eintracht Baunatal II",gruppe:"B",platz:3,sp:5,t:"9:2",td:7,pkt:8},
+  {name:"JSG OSG",gruppe:"B",platz:4,sp:5,t:"7:4",td:3,pkt:7},
+  {name:"TSV Besse",gruppe:"B",platz:5,sp:5,t:"5:7",td:-2,pkt:4},
+  {name:"JSG Melsungen/Koerle",gruppe:"B",platz:6,sp:5,t:"1:23",td:-22,pkt:0},
+  {name:"SV BW Bilshausen",gruppe:"C",platz:1,sp:5,t:"21:4",td:17,pkt:13},
+  {name:"SV Wacker 04 Bad Salzungen",gruppe:"C",platz:2,sp:5,t:"11:7",td:4,pkt:9},
+  {name:"JSG Fuldatal",gruppe:"C",platz:3,sp:5,t:"7:6",td:1,pkt:8},
+  {name:"Eintracht Baunatal III",gruppe:"C",platz:4,sp:5,t:"3:9",td:-6,pkt:4},
+  {name:"JSG Alheim",gruppe:"C",platz:5,sp:5,t:"3:12",td:-9,pkt:4},
+  {name:"Tuspo Rengershausen",gruppe:"C",platz:6,sp:5,t:"2:9",td:-7,pkt:2},
+  {name:"VfL Kassel",gruppe:"D",platz:1,sp:5,t:"8:0",td:8,pkt:13},
+  {name:"TSV Hertingshausen",gruppe:"D",platz:2,sp:5,t:"7:2",td:5,pkt:8},
+  {name:"CSC03 Kassel",gruppe:"D",platz:3,sp:5,t:"4:1",td:3,pkt:8},
+  {name:"FC Grone",gruppe:"D",platz:4,sp:5,t:"6:5",td:1,pkt:6},
+  {name:"JSG Melsungen / Koerle II",gruppe:"D",platz:5,sp:5,t:"5:7",td:-2,pkt:5},
+  {name:"JSG Reinhardshagen/Bonaforth",gruppe:"D",platz:6,sp:5,t:"0:15",td:-15,pkt:0},
+];
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDTiwy41T61OXNMPPiu8axLcl8Ym6QuEgw",
-  authDomain: "tombola-37f9d.firebaseapp.com",
-  databaseURL: "https://tombola-37f9d-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "tombola-37f9d",
-  storageBucket: "tombola-37f9d.firebasestorage.app",
-  messagingSenderId: "1003738433183",
-  appId: "1:1003738433183:web:8baa1d6d79ca21bedcc4aa"
-};
+let selectedIdx = null;
 
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-const entriesRef = ref(db, 'tombola/entries');
+function getQNr(i){ return "QU-2025-" + String(i+1).padStart(3,"0"); }
 
-let entries = [], fil = 'all';
-
-function sync(ok, msg) {
-  document.getElementById('dot').className = 'dot' + (ok === true ? ' on' : ok === false ? ' err' : '');
-  document.getElementById('syncMsg').textContent = msg;
-}
-
-// Echtzeit-Listener – jede Änderung erscheint sofort bei allen
-onValue(entriesRef,
-  (snapshot) => {
-    const data = snapshot.val() || {};
-    entries = Object.entries(data)
-      .map(([id, v]) => ({ id, ...v }))
-      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    sync(true, '🟢 Live – ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }));
-    render();
-  },
-  (err) => sync(false, 'Fehler: ' + err.message)
-);
-
-// ── Hilfsfunktionen ──────────────────────────────────────────
-function esc(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function sIcon(s)  { return s==='confirmed'?'🎁':s==='declined'?'❌':'🙏'; }
-function sLabel(s) { return s==='confirmed'?'✅ Zugesagt':s==='declined'?'❌ Abgesagt':'⏳ Offen'; }
-
-function updateStats() {
-  const t=entries.length,
-        c=entries.filter(e=>e.status==='confirmed').length,
-        d=entries.filter(e=>e.status==='declined').length;
-  document.getElementById('sAll').textContent  = t;
-  document.getElementById('sPend').textContent = t - c - d;
-  document.getElementById('sConf').textContent = c;
-  document.getElementById('sDecl').textContent = d;
-}
-
-function render() {
-  updateStats();
-  const list  = document.getElementById('list');
-  const shown = fil === 'all' ? entries : entries.filter(e => e.status === fil);
-  if (!shown.length) {
-    const m = { all:'Noch keine Einträge. Tragt eure erste Anfrage ein!', pending:'Keine offenen Anfragen!', confirmed:'Noch keine Zusagen – weiter anfragen!', declined:'Keine Absagen – super! 🎉' };
-    const i = { all:'📭', pending:'⏳', confirmed:'🎁', declined:'🎉' };
-    list.innerHTML = `<div class="empty"><div class="ico">${i[fil]}</div>${m[fil]}</div>`;
-    return;
-  }
-  list.innerHTML = shown.map(e => `
-    <div class="ec ${e.status}">
-      <div class="etop">
-        <div class="ename">${sIcon(e.status)} ${esc(e.name)}</div>
-        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
-          <span class="pill ${e.status}">${sLabel(e.status)}</span>
-          <span class="dchip">${esc(e.date)}</span>
+function render(){
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  const gf = document.getElementById("groupFilter").value;
+  const list = document.getElementById("list");
+  const filtered = teams.filter(t => t.name.toLowerCase().includes(q) && (!gf || t.gruppe===gf));
+  if(!filtered.length){ list.innerHTML='<p class="empty">Keine Mannschaften gefunden.</p>'; return; }
+  const byGroup={};
+  filtered.forEach(t=>{ if(!byGroup[t.gruppe]) byGroup[t.gruppe]=[]; byGroup[t.gruppe].push(t); });
+  let html="";
+  Object.keys(byGroup).sort().forEach(g=>{
+    html+=`<div class="group-label">Gruppe ${g}</div>`;
+    byGroup[g].forEach(t=>{
+      const i=teams.indexOf(t);
+      html+=`<div class="team-card">
+        <div class="group-dot dot-${t.gruppe.toLowerCase()}">${t.gruppe}</div>
+        <div class="team-info">
+          <div class="team-name">${t.name}</div>
+          <div class="team-meta">Platz ${t.platz} &middot; ${t.sp} Spiele &middot; ${t.pkt} Punkte &middot; ${getQNr(i)}</div>
         </div>
-      </div>
-      <div class="etarget">📍 Angefragt bei: <strong>${esc(e.target)}</strong></div>
-      ${e.note ? `<div class="enote">💬 ${esc(e.note)}</div>` : ''}
-      ${e.status==='confirmed' ? `<div class="edonation">🎀 Spende: ${esc(e.donation)}${e.donationNote?' – '+esc(e.donationNote):''}</div>` : ''}
-      ${e.status==='declined'  ? `<div class="edeclined">❌ Abgesagt${e.declineReason?' – '+esc(e.declineReason):''}</div>` : ''}
-      <div class="eactions">
-        ${e.status==='pending' ? `
-          <button class="btn bg bs" onclick="toggleForm('${e.id}','confirm')">✅ Zusage</button>
-          <button class="btn br bs" onclick="toggleForm('${e.id}','decline')">❌ Absage</button>
-        ` : `<button class="btn bo bs" onclick="resetEntry('${e.id}')">↩ Zurücksetzen</button>`}
-        <button class="btn bo bs" onclick="delEntry('${e.id}')">🗑</button>
-      </div>
-      <div class="cform cf-y" id="confirmF_${e.id}">
-        <label style="display:block;margin-bottom:3px;font-size:10px;font-weight:800;color:#15803d;text-transform:uppercase">🎁 Was wird gespendet?</label>
-        <input id="don_${e.id}" placeholder="z.B. Gutschein 20€, Spielzeugset, Torte...">
-        <label style="display:block;margin-bottom:3px;font-size:10px;font-weight:800;color:#6b7280;text-transform:uppercase">Zusatz-Info (optional)</label>
-        <textarea id="donN_${e.id}" placeholder="Besondere Hinweise..." style="min-height:42px"></textarea>
-        <button class="btn bg bs" onclick="saveConfirm('${e.id}')">💾 Speichern</button>
-        <button class="btn bo bs" onclick="toggleForm('${e.id}','confirm')" style="margin-left:4px">Abbrechen</button>
-      </div>
-      <div class="cform cf-n" id="declineF_${e.id}">
-        <label style="display:block;margin-bottom:3px;font-size:10px;font-weight:800;color:#991b1b;text-transform:uppercase">❌ Grund der Absage (optional)</label>
-        <input id="decR_${e.id}" placeholder="z.B. Kein Interesse, nicht erreichbar...">
-        <button class="btn br bs" onclick="saveDecline('${e.id}')">💾 Absage speichern</button>
-        <button class="btn bo bs" onclick="toggleForm('${e.id}','decline')" style="margin-left:4px">Abbrechen</button>
-      </div>
-    </div>
-  `).join('');
+        <span class="amount">30,00 &euro;</span>
+        <button class="btn-dl" onclick="openModal(${i})">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Quittung
+        </button>
+      </div>`;
+    });
+  });
+  list.innerHTML=html;
 }
 
-// ── Aktionen ─────────────────────────────────────────────────
-window.addEntry = async function() {
-  const name   = document.getElementById('iName').value.trim();
-  const target = document.getElementById('iTarget').value.trim();
-  const note   = document.getElementById('iNote').value.trim();
-  if (!name || !target) { alert('Bitte Name und Angefragt-bei ausfüllen!'); return; }
-  const btn = document.getElementById('btnAdd');
-  btn.disabled = true; btn.textContent = '⏳ Speichern...';
-  await push(entriesRef, {
-    name, target, note,
-    status: 'pending', donation: '', donationNote: '', declineReason: '',
-    date: new Date().toLocaleDateString('de-DE'),
-    createdAt: Date.now()
+function openModal(i){
+  selectedIdx=i;
+  const t=teams[i];
+  document.getElementById("modal-title").textContent=t.name;
+  document.getElementById("modal-rows").innerHTML=`
+    <div class="receipt-row"><span class="receipt-label">Quittungs-Nr.</span><span class="receipt-val">${getQNr(i)}</span></div>
+    <div class="receipt-row"><span class="receipt-label">Mannschaft</span><span class="receipt-val">${t.name}</span></div>
+    <div class="receipt-row"><span class="receipt-label">Gruppe</span><span class="receipt-val">Gruppe ${t.gruppe}</span></div>
+    <div class="receipt-row"><span class="receipt-label">Betrag</span><span class="receipt-val green">30,00 &euro;</span></div>
+    <div class="receipt-row"><span class="receipt-label">Zahlungsart</span><span class="receipt-val">PayPal</span></div>
+    <div class="receipt-row"><span class="receipt-label">Datum</span><span class="receipt-val">31.05.2026</span></div>
+    <div class="receipt-row"><span class="receipt-label">Verwendungszweck</span><span class="receipt-val">Startgeld Turnier 2025</span></div>
+  `;
+  document.getElementById("modal").style.display="flex";
+}
+
+function overlayClick(e){ if(e.target===document.getElementById("modal")) closeModal(); }
+function closeModal(){ document.getElementById("modal").style.display="none"; selectedIdx=null; }
+
+function generatePDF(){
+  const i=selectedIdx;
+  const t=teams[i];
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:"mm",format:"a4"});
+  const pw=210, lm=20, rm=20, cw=pw-lm-rm;
+
+  // Blauer Header-Balken
+  doc.setFillColor(26,58,107);
+  doc.rect(0,0,pw,12,"F");
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(10);
+  doc.setTextColor(255,255,255);
+  doc.text("TURNIER 2025 · EINTRACHT BAUNATAL", pw/2, 8, {align:"center"});
+
+  // Titel
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(22);
+  doc.setTextColor(26,58,107);
+  doc.text("QUITTUNG", lm, 30);
+
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(10);
+  doc.setTextColor(120,120,120);
+  doc.text("Startgeldbestaetigung · Turnier 2025", lm, 37);
+
+  // PayPal Hinweis
+  doc.setFillColor(240,247,255);
+  doc.roundedRect(lm, 42, cw, 10, 2, 2, "F");
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(9);
+  doc.setTextColor(0,48,135);
+  doc.text("PayPal", lm+4, 48.5);
+  doc.setFont("helvetica","normal");
+  doc.setTextColor(80,80,80);
+  doc.text("Zahlung erfolgreich eingegangen", lm+22, 48.5);
+
+  // Trennlinie
+  doc.setDrawColor(220,225,235);
+  doc.setLineWidth(0.5);
+  doc.line(lm, 57, pw-rm, 57);
+
+  // Quittungs-Nr & Datum
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9);
+  doc.setTextColor(130,130,130);
+  doc.text("Quittungs-Nr.", lm, 65);
+  doc.text("Datum", pw/2+5, 65);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(12);
+  doc.setTextColor(26,26,26);
+  doc.text(getQNr(i), lm, 72);
+  doc.text("31.05.2026", pw/2+5, 72);
+
+  // Tabelle mit Daten
+  const rows=[
+    ["Mannschaft", t.name],
+    ["Gruppe", "Gruppe "+t.gruppe],
+    ["Betrag", "30,00 EUR"],
+    ["Zahlungsart", "PayPal"],
+    ["Verwendungszweck", "Startgeld Turnier 2025"],
+    ["Tabellenplatz", "Platz "+t.platz+" (Gruppe "+t.gruppe+")"],
+    ["Spiele / Punkte", t.sp+" Spiele, "+t.pkt+" Punkte"],
+  ];
+
+  let y=84;
+  rows.forEach(([label,val],idx)=>{
+    if(idx%2===0){ doc.setFillColor(248,250,253); doc.rect(lm,y-5,cw,11,"F"); }
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(9);
+    doc.setTextColor(120,120,120);
+    doc.text(label, lm+3, y);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(10);
+    doc.setTextColor(26,26,26);
+    if(label==="Betrag"){ doc.setTextColor(22,101,52); }
+    doc.text(val, lm+58, y);
+    doc.setTextColor(26,26,26);
+    y+=12;
   });
-  document.getElementById('iName').value  = '';
-  document.getElementById('iTarget').value = '';
-  document.getElementById('iNote').value  = '';
-  btn.disabled = false; btn.textContent = '✅ Anfrage speichern';
-};
 
-window.toggleForm = function(id, type) {
-  ['confirm','decline'].forEach(t => {
-    const el = document.getElementById(t + 'F_' + id);
-    if (el) t === type ? el.classList.toggle('open') : el.classList.remove('open');
-  });
-};
+  // Bestätigungstext
+  y+=8;
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9.5);
+  doc.setTextColor(60,60,60);
+  doc.text("Hiermit bestaetigen wir den Eingang des Startgeldes in Hoehe von 30,00 EUR", lm, y);
+  doc.text("fuer die oben genannte Mannschaft. Die Zahlung erfolgte via PayPal.", lm, y+6);
 
-window.saveConfirm = async function(id) {
-  const donation     = document.getElementById('don_'  + id).value.trim();
-  const donationNote = document.getElementById('donN_' + id).value.trim();
-  if (!donation) { alert('Bitte angeben was gespendet wird!'); return; }
-  await update(ref(db, 'tombola/entries/' + id), { status:'confirmed', donation, donationNote, declineReason:'' });
-};
+  // Unterschrift
+  y+=26;
+  doc.setDrawColor(180,180,180);
+  doc.setLineWidth(0.5);
+  doc.line(lm, y, lm+90, y);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(10);
+  doc.setTextColor(26,26,26);
+  doc.text("Alexander Kellner", lm, y+7);
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9);
+  doc.setTextColor(100,100,100);
+  doc.text("Eintracht Baunatal", lm, y+13);
+  doc.text("31.05.2026", lm, y+19);
 
-window.saveDecline = async function(id) {
-  const declineReason = document.getElementById('decR_' + id).value.trim();
-  await update(ref(db, 'tombola/entries/' + id), { status:'declined', declineReason, donation:'', donationNote:'' });
-};
+  // Footer
+  doc.setFillColor(26,58,107);
+  doc.rect(0,282,pw,15,"F");
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(8);
+  doc.setTextColor(255,255,255);
+  doc.text("Eintracht Baunatal · Turnier 2025 · Startgeld 30,00 EUR · Zahlung via PayPal", pw/2, 291, {align:"center"});
 
-window.resetEntry = async function(id) {
-  if (!confirm('Status zurücksetzen auf Offen?')) return;
-  await update(ref(db, 'tombola/entries/' + id), { status:'pending', donation:'', donationNote:'', declineReason:'' });
-};
+  doc.save("Quittung_"+t.name.replace(/[^a-zA-Z0-9]/g,"_")+"_"+getQNr(i)+".pdf");
 
-window.delEntry = async function(id) {
-  if (!confirm('Eintrag löschen?')) return;
-  await remove(ref(db, 'tombola/entries/' + id));
-};
+  closeModal();
+  const toast=document.getElementById("toast");
+  document.getElementById("toast-msg").textContent="Quittung fuer "+t.name+" heruntergeladen";
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),3200);
+}
 
-window.setF = function(f, el) {
-  fil = f;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('act','act-r'));
-  el.classList.add(f === 'declined' ? 'act-r' : 'act');
-  render();
-};
+render();
 </script>
 </body>
 </html>
